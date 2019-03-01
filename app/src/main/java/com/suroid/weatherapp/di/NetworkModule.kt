@@ -56,7 +56,8 @@ class NetworkModule {
                 .addInterceptor { chain ->
                     var request = chain.request()
                     // Add constant params using okhttp interceptor
-                    val url = request.url().newBuilder().addQueryParameter("key", BuildConfig.API_KEY).build()
+                    val url = request.url().newBuilder().addQueryParameter("APPID", BuildConfig.API_KEY)
+                            .addQueryParameter("units", "metric").build()
                     request = request.newBuilder().url(url).build()
                     chain.proceed(request)
                 }

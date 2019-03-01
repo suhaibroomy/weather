@@ -9,7 +9,7 @@
     <string name="temperature">Temperature</string>
     <string name="humidity">Humidity</string>
     <string name="wind_speed_metric">m/s</string>
-    <string name="temp_metric">°K</string>
+    <string name="temp_metric">°C</string>
     <string name="humidity_metric">%</string>
     <string name="welcome_msg">Hello! Tap me to auto detect your location or tap on the plus button and select your city manually</string>
     <string name="settings">Settings</string>
