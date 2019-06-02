@@ -1,6 +1,6 @@
 package com.suroid.weatherapp.ui.weathercards
 
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.models.CityWeatherEntity
 import com.suroid.weatherapp.repo.CityWeatherRepository
@@ -61,7 +61,7 @@ class WeatherCardViewModel @Inject constructor(private val cityWeatherRepository
                         .subscribe({
                             updateValues(it, cityEntity)
                         }, {
-                            //TODO handle error here
+                            print(it.localizedMessage)
                         }))
 
     }

@@ -1,16 +1,14 @@
 package com.suroid.weatherapp.repo
 
-import android.support.annotation.UiThread
-import android.support.annotation.WorkerThread
+import androidx.annotation.UiThread
+import androidx.annotation.WorkerThread
 import com.suroid.weatherapp.db.CityDao
 import com.suroid.weatherapp.db.SelectedCityDao
 import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.models.SelectedCityEntity
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 import javax.inject.Singleton
 
 /**
@@ -47,7 +45,7 @@ class CityRepository(private val cityDao: CityDao, private val selectedCityDao: 
 
     @UiThread
     fun saveSelectedCityAsync(cityId: Int): Completable {
-        return Completable.fromCallable {
+        return Completable.fromAction {
             saveSelectedCity(cityId)
         }
     }

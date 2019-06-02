@@ -1,6 +1,6 @@
 package com.suroid.weatherapp.ui.home
 
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import android.location.Location
 import android.util.Log
 import com.suroid.weatherapp.models.CityEntity

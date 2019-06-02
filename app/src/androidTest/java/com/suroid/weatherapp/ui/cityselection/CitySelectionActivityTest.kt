@@ -1,7 +1,7 @@
 package com.suroid.weatherapp.ui.cityselection
 
-import android.arch.lifecycle.MutableLiveData
-import android.support.test.rule.ActivityTestRule
+import androidx.lifecycle.MutableLiveData
+import androidx.test.rule.ActivityTestRule
 import com.suroid.weatherapp.TestApp
 import com.suroid.weatherapp.models.CityEntity
 import org.junit.Rule

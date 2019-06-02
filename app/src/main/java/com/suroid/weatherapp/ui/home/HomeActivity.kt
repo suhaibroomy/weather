@@ -4,17 +4,17 @@ import android.Manifest
 import android.animation.AnimatorSet
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.ActivityOptionsCompat
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewCompat
-import android.support.v7.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.suroid.weatherapp.R
@@ -29,7 +29,7 @@ import javax.inject.Inject
 class HomeActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     @Inject
-    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
+    lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<androidx.fragment.app.Fragment>
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory

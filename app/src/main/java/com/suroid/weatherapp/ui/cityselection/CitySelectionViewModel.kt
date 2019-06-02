@@ -1,9 +1,10 @@
 package com.suroid.weatherapp.ui.cityselection
 
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import android.util.Log
 import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.repo.CityRepository
+import com.suroid.weatherapp.utils.LiveEvent
 import com.suroid.weatherapp.utils.Mockable
 import com.suroid.weatherapp.viewmodel.BaseViewModel
 import io.reactivex.Observable
@@ -19,7 +20,7 @@ class CitySelectionViewModel @Inject constructor(private val cityRepository: Cit
 
     val queryText: MutableLiveData<String> = MutableLiveData()
     val cityEntityListLiveData: MutableLiveData<List<CityEntity>> = MutableLiveData()
-    val citySelectedLivaData =  MutableLiveData<Boolean>()
+    val citySelectedLivaData =  LiveEvent<Boolean>()
     private val cityEntityList: ArrayList<CityEntity> = ArrayList()
 
 
@@ -81,6 +82,8 @@ class CitySelectionViewModel @Inject constructor(private val cityRepository: Cit
     fun saveSelectedCity(cityEntity: CityEntity) {
         compositeDisposable.add(
                 cityRepository.saveSelectedCityAsync(cityEntity.id)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
                             citySelectedLivaData.value = true
                         }, {

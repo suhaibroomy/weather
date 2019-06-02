@@ -1,6 +1,6 @@
 package com.suroid.weatherapp.models
 
-import android.arch.persistence.room.*
+import androidx.room.*
 
 @Entity(tableName = "city_weather",
         foreignKeys = [ForeignKey(entity = CityEntity::class, parentColumns = ["id"], childColumns = ["city_id"], onDelete = ForeignKey.CASCADE)])

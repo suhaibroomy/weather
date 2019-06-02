@@ -1,7 +1,7 @@
 package com.suroid.weatherapp.ui.weathercards
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.Observer
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
 import com.suroid.weatherapp.models.CityWeatherEntity
 import com.suroid.weatherapp.repo.CityWeatherRepository
 import com.suroid.weatherapp.util.RxImmediateSchedulerRule

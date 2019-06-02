@@ -2,8 +2,8 @@ package com.suroid.weatherapp.utils
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.support.annotation.ColorRes
-import android.support.v4.content.ContextCompat
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
 import android.view.View
 import android.view.ViewAnimationUtils
 import android.view.animation.AccelerateDecelerateInterpolator

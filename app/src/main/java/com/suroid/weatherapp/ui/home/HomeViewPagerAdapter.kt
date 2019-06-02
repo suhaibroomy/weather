@@ -1,16 +1,16 @@
 package com.suroid.weatherapp.ui.home
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentStatePagerAdapter
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
 import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.models.CityWeatherEntity
 import com.suroid.weatherapp.ui.weathercards.WeatherCardFragment
 
-class HomeViewPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
+class HomeViewPagerAdapter(fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentStatePagerAdapter(fm) {
     private var cityWeatherList: List<CityEntity> = ArrayList()
 
-    override fun getItem(position: Int): Fragment {
+    override fun getItem(position: Int): androidx.fragment.app.Fragment {
         return WeatherCardFragment.newInstance(cityWeatherList[position])
     }
 
