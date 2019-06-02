@@ -1,5 +1,6 @@
 package com.suroid.weatherapp.ui.cityselection
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProvider
@@ -10,15 +11,16 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.text.Editable
-import android.text.TextWatcher
 import android.transition.Transition
+import com.jakewharton.rxbinding2.view.RxView
+import com.jakewharton.rxbinding2.widget.RxTextView
 import com.suroid.weatherapp.R
-import com.suroid.weatherapp.models.City
+import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.utils.*
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_city_selection.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class CitySelectionActivity : AppCompatActivity(), CitySelectionAdapter.CityAdapterDelegate, HasSupportFragmentInjector {
@@ -31,7 +33,7 @@ class CitySelectionActivity : AppCompatActivity(), CitySelectionAdapter.CityAdap
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private lateinit var viewModel: CitySelectionViewModel
-    private lateinit var adapter : CitySelectionAdapter
+    private lateinit var adapter: CitySelectionAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +57,7 @@ class CitySelectionActivity : AppCompatActivity(), CitySelectionAdapter.CityAdap
      * Registering observers for related liveData from viewModel
      */
     private fun registerViewModelObservers() {
-        viewModel.cityListLiveData.observe(this, Observer { cityList ->
+        viewModel.cityEntityListLiveData.observe(this, Observer { cityList ->
             cityList?.let {
                 adapter.updateCityList(it)
             }
@@ -66,11 +68,16 @@ class CitySelectionActivity : AppCompatActivity(), CitySelectionAdapter.CityAdap
                 et_search.setText(it)
             }
         })
+
+        viewModel.citySelectedLivaData.observe(this, Observer {
+            performExit()
+        })
     }
 
     /**
      * Registering related listeners for views
      */
+    @SuppressLint("CheckResult")
     private fun registerViewListeners() {
         iv_back.setOnClickListener {
             performExit()
@@ -80,20 +87,13 @@ class CitySelectionActivity : AppCompatActivity(), CitySelectionAdapter.CityAdap
             viewModel.refreshData()
         }
 
-        et_search.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.searchForCities(s.toString())
-            }
-
-        })
+        RxTextView.textChanges(et_search)
+                .skipInitialValue()
+                .takeUntil(RxView.detaches(et_search))
+                .debounce(200, TimeUnit.MILLISECONDS)
+                .subscribe {
+                    viewModel.searchForCities(it.toString())
+                }
     }
 
     /**
@@ -134,11 +134,8 @@ class CitySelectionActivity : AppCompatActivity(), CitySelectionAdapter.CityAdap
         })
     }
 
-    override fun onItemClick(city: City) {
-        setResult(Activity.RESULT_OK, Intent().apply {
-            putExtra(CITY_MODEL, city)
-        })
-        performExit()
+    override fun onItemClick(cityEntity: CityEntity) {
+        viewModel.saveSelectedCity(cityEntity)
     }
 
     override fun onBackPressed() {

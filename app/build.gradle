@@ -12,6 +12,10 @@ allOpen {
     annotation 'com.suroid.weatherapp.utils.Mockable'
 }
 
+androidExtensions {
+    experimental = true
+}
+
 if (project.rootProject.file("local.properties").exists()) {
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
@@ -41,8 +45,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation project (":com.nailude.ub")
 
     //Room
     implementation "android.arch.persistence.room:runtime:$rootProject.roomVersion"
@@ -78,6 +80,8 @@ dependencies {
     //Rx
     implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxJavaVersion"
     implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxandroidVersion"
+    //RxBindings
+    implementation "com.jakewharton.rxbinding2:rxbinding:$rootProject.rxBindingVersion"
 
     implementation 'com.github.florent37:arclayout:1.0.3'
 

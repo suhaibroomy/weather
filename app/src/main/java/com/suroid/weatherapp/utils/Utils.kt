@@ -9,11 +9,11 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.google.gson.reflect.TypeToken
 import com.suroid.weatherapp.R
-import com.suroid.weatherapp.models.City
+import com.suroid.weatherapp.models.CityEntity
 import java.io.IOException
 import java.nio.charset.Charset
 
-val CITY_ARRAY_LIST_TYPE = object : TypeToken<ArrayList<City>>() {}.type
+val CITY_ARRAY_LIST_TYPE = object : TypeToken<ArrayList<CityEntity>>() {}.type
 
 fun loadJSONFromAsset(context: Context, fileName: String): String? {
     return try {

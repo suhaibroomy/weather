@@ -1,6 +1,6 @@
 package com.suroid.weatherapp.util
 
-import com.suroid.weatherapp.models.City
+import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.models.CityWeatherEntity
 import com.suroid.weatherapp.models.TemperatureModel
 import com.suroid.weatherapp.models.WeatherModel
@@ -31,11 +31,10 @@ fun createWeatherResponseModel(id: Int): WeatherResponseModel {
 
 fun createWeatherResponseModel() = createWeatherResponseModel(123)
 
-fun createCity() = City(name = "name", country = "country", id = 0)
+fun createCity() = CityEntity(name = "name", country = "country", id = 0)
 
 fun createCityWeather() = CityWeatherEntity(123,
-        WeatherModel("title", "description", TemperatureModel(1.1f, 2.2f, 3.3f), 4f, 5, 6),
-        city = createCity())
+        WeatherModel("title", "description", TemperatureModel(1.1f, 2.2f, 3.3f), 4f, 5, 6))
 
 
 fun <T> matches(predicate: Predicate<T>): ArgumentMatcher<T> {

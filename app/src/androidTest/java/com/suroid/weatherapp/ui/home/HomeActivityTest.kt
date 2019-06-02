@@ -51,9 +51,9 @@ class HomeActivityTest {
             super.beforeActivityLaunched()
             Mockito.`when`(viewModel.loading).thenReturn(loading)
             Mockito.`when`(viewModel.fetchCityResult).thenReturn(fetchCityResult)
-            Mockito.`when`(viewModel.cityWeatherListLiveData).thenReturn(cityWeatherListLiveData)
+            Mockito.`when`(viewModel.cityListLiveData).thenReturn(cityWeatherListLiveData)
 
-            Mockito.`when`(TestApp.citySelectionViewModel.cityListLiveData).thenReturn(MutableLiveData())
+            Mockito.`when`(TestApp.citySelectionViewModel.cityEntityListLiveData).thenReturn(MutableLiveData())
             Mockito.`when`(TestApp.citySelectionViewModel.queryText).thenReturn(MutableLiveData())
 
             Mockito.`when`(TestApp.weatherCardViewModel.loadingStatus).thenReturn(MutableLiveData())
@@ -118,7 +118,7 @@ class HomeActivityTest {
     @Test
     fun addCardTest() {
         val arr = arrayListOf(createCityWeather())
-        viewModel.cityWeatherListLiveData.postValue(arr)
+        viewModel.cityListLiveData.postValue(arr)
         onView(allOf(withId(R.id.weather_card_root))).check(ViewAssertions.matches(isCompletelyDisplayed()))
     }
 

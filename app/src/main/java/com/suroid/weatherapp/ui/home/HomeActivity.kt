@@ -18,7 +18,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.suroid.weatherapp.R
-import com.suroid.weatherapp.models.City
+import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.ui.cityselection.CitySelectionActivity
 import com.suroid.weatherapp.utils.*
 import dagger.android.DispatchingAndroidInjector
@@ -70,7 +70,7 @@ class HomeActivity : AppCompatActivity(), HasSupportFragmentInjector {
      * Registering observers for related liveData from viewModel
      */
     private fun registerViewModelObservers() {
-        viewModel.cityWeatherListLiveData.observe(this, Observer { cityList ->
+        viewModel.cityListLiveData.observe(this, Observer { cityList ->
             cityList?.let {
                 if (it.isNotEmpty()) {
                     group_welcome.visibility = View.GONE
@@ -140,15 +140,6 @@ class HomeActivity : AppCompatActivity(), HasSupportFragmentInjector {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         handlePermissionResult(Manifest.permission.ACCESS_COARSE_LOCATION) {
             requestLocation()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            data?.getParcelableExtra<City>(CITY_MODEL)?.let {
-                viewModel.saveNewCity(it)
-            }
         }
     }
 

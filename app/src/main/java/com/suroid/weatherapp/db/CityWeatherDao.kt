@@ -10,8 +10,8 @@ import io.reactivex.Single
 abstract class CityWeatherDao : BaseDao<CityWeatherEntity> {
 
     /**
-     * Get all CityWeathers along with City and forecast.
+     * Get all CityWeathers along with CityEntity and forecast.
      */
-    @Query("SELECT * FROM CityWeatherEntity")
-    abstract fun getAllCityWeathers(): Single<List<CityWeatherEntity>>
+    @Query("SELECT * FROM city_weather WHERE city_id = :id")
+    abstract fun getCityWeatherByCityId(id: Int): Single<CityWeatherEntity>
 }

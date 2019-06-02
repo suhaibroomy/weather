@@ -1,16 +1,13 @@
 package com.suroid.weatherapp.ui.home
 
-import android.annotation.SuppressLint
 import android.arch.lifecycle.MutableLiveData
 import android.location.Location
 import android.util.Log
-import com.suroid.weatherapp.viewmodel.BaseViewModel
-import com.suroid.weatherapp.models.City
-import com.suroid.weatherapp.models.CityWeatherEntity
-import com.suroid.weatherapp.models.WeatherModel
-import com.suroid.weatherapp.models.remote.ResponseStatus
+import com.suroid.weatherapp.models.CityEntity
+import com.suroid.weatherapp.repo.CityRepository
 import com.suroid.weatherapp.repo.CityWeatherRepository
 import com.suroid.weatherapp.utils.Mockable
+import com.suroid.weatherapp.viewmodel.BaseViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
@@ -19,51 +16,26 @@ import javax.inject.Inject
  * @Inject Injects the required [CityWeatherRepository] in this ViewModel.
  */
 @Mockable
-class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityWeatherRepository) : BaseViewModel() {
+class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityWeatherRepository, private val cityRepository: CityRepository) : BaseViewModel() {
 
-    val cityWeatherListLiveData: MutableLiveData<ArrayList<CityWeatherEntity>> = MutableLiveData()
+    val cityListLiveData: MutableLiveData<ArrayList<CityEntity>> = MutableLiveData()
     val loading: MutableLiveData<Boolean> = MutableLiveData()
     val fetchCityResult: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
-        compositeDisposable.add(cityWeatherRepository.getAllCityWeathers()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    onCitiesFetched(it)
-                }, {
-                    onError(it)
-                }))
-
-        compositeDisposable.add(cityWeatherRepository.responseSubject.subscribe { response ->
-            when (response) {
-                is ResponseStatus.Progress -> {
-                    if (response.tag == UNKNOWN_CITY) {
-                        loading.value = response.loading
-                    }
-                }
-                is ResponseStatus.Success -> {
-                    cityWeatherListLiveData.value?.let {
-                        val pos = it.indexOf(response.data)
-                        if (pos > -1) {
-                            it[pos] = response.data
-                        } else {
-                            it.add(response.data)
-                            cityWeatherListLiveData.value = it
-                        }
-                    }
-                }
-                is ResponseStatus.Failure -> {
-                    if (response.tag == UNKNOWN_CITY) {
-                        fetchCityResult.value = false
-                    }
-                }
-            }
-        })
+        compositeDisposable.add(
+                cityRepository.getSelectedCities()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            onCitiesFetched(it)
+                        }, {
+                            onError(it)
+                        }))
     }
 
-    private fun onCitiesFetched(cityWeatherList: List<CityWeatherEntity>) {
-        cityWeatherListLiveData.value = ArrayList(cityWeatherList)
+    private fun onCitiesFetched(cityList: List<CityEntity>) {
+        cityListLiveData.value = ArrayList(cityList)
     }
 
     private fun onError(t: Throwable?) {
@@ -72,32 +44,24 @@ class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityW
     }
 
     /**
-     * Saves the provided city in WeatherDb
-     * @param city city to be added
+     * fetches the cityWeather for the location provided
+     * @param location location object of the place
      */
-    fun saveNewCity(city: City) {
-        val cityWeather = CityWeatherEntity(id = city.id, city = city, currentWeather = WeatherModel())
-        cityWeatherListLiveData.value?.let {
-            if (!it.contains(cityWeather)) {
-                cityWeatherRepository.saveCityWeather(cityWeather)
-                it.add(cityWeather)
-                cityWeatherListLiveData.value = it
-            }
-        }
-    }
-
-
-    /**
-     * Saves the provided city in WeatherDb
-     * @param city city to be added
-     */
-    @SuppressLint("MissingPermission")
     fun fetchForCurrentLocation(location: Location) {
-        cityWeatherRepository.fetchWeatherWithLatLong(location.latitude, location.longitude, UNKNOWN_CITY)
+        compositeDisposable.add(
+                cityWeatherRepository.fetchWeatherWithLatLong(location.latitude, location.longitude)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe {
+                            loading.value = true
+                        }
+                        .doFinally {
+                            loading.value = false
+                        }
+                        .doOnSuccess {
+                            cityRepository.saveSelectedCity(it.cityId)
+                        }
+                        .subscribe())
 
-    }
-
-    companion object {
-        const val UNKNOWN_CITY = -1
     }
 }

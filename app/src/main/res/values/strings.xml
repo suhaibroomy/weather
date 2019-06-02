@@ -2,7 +2,7 @@
     <string name="app_name">Weather</string>
     <string name="fab_transition">fab_transition</string>
     <string name="search">Search</string>
-    <string name="city_search_hint">Search your city</string>
+    <string name="city_search_hint">Search your cityEntity</string>
     <string name="city_country_format">%1$s, %2$s</string>
 
     <string name="wind">Wind</string>
@@ -11,7 +11,7 @@
     <string name="wind_speed_metric">m/s</string>
     <string name="temp_metric">°C</string>
     <string name="humidity_metric">%</string>
-    <string name="welcome_msg">Hello! Tap me to auto detect your location or tap on the plus button and select your city manually</string>
+    <string name="welcome_msg">Hello! Tap me to auto detect your location or tap on the plus button and select your cityEntity manually</string>
     <string name="settings">Settings</string>
     <string name="cancel">Cancel</string>
     <string name="permissions_needed_dialog_title">Permissions Needed</string>

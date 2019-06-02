@@ -1,20 +1,20 @@
 package com.suroid.weatherapp.ui.weathercards
 
 import android.arch.lifecycle.MutableLiveData
-import com.suroid.weatherapp.viewmodel.BaseViewModel
+import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.models.CityWeatherEntity
-import com.suroid.weatherapp.models.remote.ResponseStatus
 import com.suroid.weatherapp.repo.CityWeatherRepository
-import com.suroid.weatherapp.utils.Mockable
-import com.suroid.weatherapp.utils.weatherIconForId
-import com.suroid.weatherapp.utils.weatherImageForId
+import com.suroid.weatherapp.utils.*
+import com.suroid.weatherapp.viewmodel.BaseViewModel
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 /**
  * @Inject Injects the required [CityWeatherRepository] in this ViewModel.
  */
 @Mockable
-class WeatherCardViewModel @Inject constructor(private val cityWeatherRepository: CityWeatherRepository): BaseViewModel() {
+class WeatherCardViewModel @Inject constructor(private val cityWeatherRepository: CityWeatherRepository) : BaseViewModel() {
 
     val loadingStatus: MutableLiveData<Boolean> = MutableLiveData()
     val temp: MutableLiveData<String> = MutableLiveData()
@@ -26,28 +26,47 @@ class WeatherCardViewModel @Inject constructor(private val cityWeatherRepository
     val icon: MutableLiveData<Int> = MutableLiveData()
     val image: MutableLiveData<Int> = MutableLiveData()
 
-    fun setupWithCity(cityWeather: CityWeatherEntity) {
-        updateValues(cityWeather)
-        compositeDisposable.add(cityWeatherRepository.responseSubject.subscribe { response ->
-            if (response.tag is CityWeatherEntity && response.tag == cityWeather) {
-                when (response) {
-                    is ResponseStatus.Progress -> {
-                        loadingStatus.value = response.loading
-                    }
-                    is ResponseStatus.Success -> {
-                        updateValues(response.data)
-                    }
-                    is ResponseStatus.Failure -> {
-                        //TODO handle failure here
-                    }
+    fun setupWithCity(cityEntity: CityEntity) {
+        compositeDisposable.add(cityWeatherRepository
+                .getCityWeatherByCityId(cityEntity)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe {
+                    loadingStatus.value = true
                 }
-            }
-        })
-
-        cityWeatherRepository.fetchWeatherOfCity(cityWeather)
+                .doOnSuccess {
+                    loadingStatus.value = false
+                }
+                .subscribe({
+                    updateValues(it, cityEntity)
+                    if (currentTimeInSeconds() - it.date >= WEATHER_EXPIRY_THRESHOLD_TIME) {
+                        updateCityWeather(cityEntity)
+                    }
+                }, {
+                    updateCityWeather(cityEntity)
+                }))
     }
 
-    private fun updateValues(cityWeather: CityWeatherEntity) {
+    private fun updateCityWeather(cityEntity: CityEntity) {
+        compositeDisposable.add(
+                cityWeatherRepository.fetchWeatherOfCity(cityEntity)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .doOnSubscribe {
+                            loadingStatus.value = true
+                        }
+                        .doFinally {
+                            loadingStatus.value = false
+                        }
+                        .subscribe({
+                            updateValues(it, cityEntity)
+                        }, {
+                            //TODO handle error here
+                        }))
+
+    }
+
+    private fun updateValues(cityWeather: CityWeatherEntity, cityEntity: CityEntity) {
         cityWeather.currentWeather?.let {
             it.temperature?.let { temperature ->
                 temp.value = temperature.temp?.toInt().toString()
@@ -60,7 +79,7 @@ class WeatherCardViewModel @Inject constructor(private val cityWeatherRepository
             image.value = weatherImageForId(it.weather_id ?: 0)
 
         }
-        city.value = "${cityWeather.city.name}, ${cityWeather.city.country}"
+        city.value = "${cityEntity.name}, ${cityEntity.country}"
     }
 
 }

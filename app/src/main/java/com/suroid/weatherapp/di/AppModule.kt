@@ -9,8 +9,9 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.suroid.weatherapp.db.CityDao
 import com.suroid.weatherapp.db.CityWeatherDao
+import com.suroid.weatherapp.db.SelectedCityDao
 import com.suroid.weatherapp.db.WeatherDb
-import com.suroid.weatherapp.models.City
+import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.utils.CITIES_JSON_FILE_NAME
 import com.suroid.weatherapp.utils.CITY_ARRAY_LIST_TYPE
 import com.suroid.weatherapp.utils.loadJSONFromAsset
@@ -40,8 +41,8 @@ class AppModule(private val app: Application) {
                         //Prepopulate DataBase with list of cities
 
                         Completable.fromCallable {
-                            val cities: List<City>? = loadJSONFromAsset(app, CITIES_JSON_FILE_NAME)?.objectify(CITY_ARRAY_LIST_TYPE)
-                            cities?.let {
+                            val cityEntities: List<CityEntity>? = loadJSONFromAsset(app, CITIES_JSON_FILE_NAME)?.objectify(CITY_ARRAY_LIST_TYPE)
+                            cityEntities?.let {
                                 weatherDb.cityDao().insert(it)
                             }
                         }.subscribeOn(Schedulers.io()).subscribe()
@@ -93,6 +94,17 @@ class AppModule(private val app: Application) {
     @Provides
     fun provideCityWeatherDao(db: WeatherDb): CityWeatherDao {
         return db.cityWeatherDao()
+    }
+
+    /**
+     * Provides [SelectedCityDao]
+     * @param db [WeatherDb] is required as parameter
+     * @return [CityWeatherDao]
+     */
+    @Singleton
+    @Provides
+    fun provideSelectedCityDao(db: WeatherDb): SelectedCityDao {
+        return db.selectedCityDao()
     }
 
     @Provides

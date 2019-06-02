@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.suroid.weatherapp.R
 import com.suroid.weatherapp.di.Injectable
+import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.models.CityWeatherEntity
 import com.suroid.weatherapp.utils.fadeInImage
 import com.suroid.weatherapp.utils.setupProgressAnimation
@@ -30,7 +31,7 @@ class WeatherCardFragment : Fragment(), Injectable {
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(WeatherCardViewModel::class.java)
 
-        arguments?.getParcelable<CityWeatherEntity>(CITY_WEATHER_ENTITY)?.let {
+        arguments?.getParcelable<CityEntity>(CITY_ENTITY)?.let {
             viewModel.setupWithCity(it)
         }
 
@@ -113,19 +114,19 @@ class WeatherCardFragment : Fragment(), Injectable {
 
     companion object {
 
-        private const val CITY_WEATHER_ENTITY = "city_weather_entity"
+        private const val CITY_ENTITY = "city_entity"
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
-         * @param cityWeatherEntity [CityWeatherEntity] instance to be passed.
+         * @param cityEntity [CityEntity] instance to be passed.
          * @return A new instance of fragment [WeatherCardFragment].
          */
         @JvmStatic
-        fun newInstance(cityWeatherEntity: CityWeatherEntity) =
+        fun newInstance(cityEntity: CityEntity) =
                 WeatherCardFragment().apply {
                     arguments = Bundle().apply {
-                        putParcelable(CITY_WEATHER_ENTITY, cityWeatherEntity)
+                        putParcelable(CITY_ENTITY, cityEntity)
                     }
                 }
     }

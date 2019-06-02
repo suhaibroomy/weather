@@ -20,11 +20,13 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.gson.Gson
 import com.suroid.weatherapp.R
-import com.suroid.weatherapp.models.City
+import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.models.CityWeatherEntity
 import com.suroid.weatherapp.models.TemperatureModel
 import com.suroid.weatherapp.models.WeatherModel
 import com.suroid.weatherapp.models.remote.WeatherResponseModel
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
 import java.lang.reflect.Type
 
 val gson = Gson()
@@ -74,19 +76,14 @@ fun Activity.handlePermissionResult(permission: String, success: () -> Unit) {
         success()
     } else {
         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
-            AlertDialog.Builder(this).setTitle(getString(R.string.permissions_needed_dialog_title)).
-                    setMessage(getString(R.string.permissions_needed_dialog_message)).
-                    setPositiveButton(R.string.settings) { _, _ ->
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")).apply {
-                            addCategory(Intent.CATEGORY_DEFAULT)
-                        }
-                        startActivity(intent)
-                    }.setNegativeButton(R.string.cancel) { _, _ -> }.create().show()
+            AlertDialog.Builder(this).setTitle(getString(R.string.permissions_needed_dialog_title)).setMessage(getString(R.string.permissions_needed_dialog_message)).setPositiveButton(R.string.settings) { _, _ ->
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName")).apply {
+                    addCategory(Intent.CATEGORY_DEFAULT)
+                }
+                startActivity(intent)
+            }.setNegativeButton(R.string.cancel) { _, _ -> }.create().show()
         } else {
-            AlertDialog.Builder(this).setTitle(getString(R.string.permissions_needed_dialog_title)).
-                    setMessage(getString(R.string.permissions_rationale_dialog_message)).
-                    setPositiveButton(R.string.retry) { _, _ -> ActivityCompat.requestPermissions(this, arrayOf(permission), 0) }.
-                    setNegativeButton(R.string.cancel) { _, _ -> }.create().show()
+            AlertDialog.Builder(this).setTitle(getString(R.string.permissions_needed_dialog_title)).setMessage(getString(R.string.permissions_rationale_dialog_message)).setPositiveButton(R.string.retry) { _, _ -> ActivityCompat.requestPermissions(this, arrayOf(permission), 0) }.setNegativeButton(R.string.cancel) { _, _ -> }.create().show()
         }
     }
 }
@@ -114,20 +111,17 @@ fun Context.showToast(@StringRes message: Int) {
 }
 
 /**
- * Extension function to push the loading status to the observing responseStatus
+ * Extension function WeatherResponseModel to CityWeatherEntity
  * */
-fun WeatherResponseModel.mapToWeatherEntity(cityWeather: CityWeatherEntity): CityWeatherEntity {
+fun WeatherResponseModel.mapToWeatherEntity(cityEntity: CityEntity? = null): CityWeatherEntity {
     val temperatureModel = TemperatureModel(main.temp, main.temp_min, main.temp_max)
     val weatherModel = WeatherModel(getWeather()?.main, getWeather()?.description, temperatureModel, wind.speed, main.humidity, getWeather()?.id)
-    return CityWeatherEntity(id, weatherModel, city = cityWeather.city, date = currentTimeInSeconds())
+    return CityWeatherEntity(cityEntity?.id ?: id, weatherModel, date = currentTimeInSeconds())
 }
 
 /**
- * Extension function to push the loading status to the observing responseStatus
+ * Extension function WeatherResponseModel to CityWeatherEntity
  * */
-fun WeatherResponseModel.mapToWeatherEntity(): CityWeatherEntity {
-    val temperatureModel = TemperatureModel(main.temp, main.temp_min, main.temp_max)
-    val weatherModel = WeatherModel(getWeather()?.main, getWeather()?.description, temperatureModel, wind.speed, main.humidity, getWeather()?.id)
-    val city = City(name, sys.country, id)
-    return CityWeatherEntity(id, weatherModel, city = city, date = currentTimeInSeconds())
+fun WeatherResponseModel.mapToCityEntity(): CityEntity {
+    return CityEntity(name, sys.country, id)
 }
