@@ -57,7 +57,7 @@ class CitySelectionViewModel @Inject constructor(private val cityRepository: Cit
 
     /**
      * Search for the city corresponding to the query
-     * @param query Query to be searched
+     * @param query [String]Query to be searched
      */
     fun searchForCities(query: String) {
         launch {
@@ -80,6 +80,10 @@ class CitySelectionViewModel @Inject constructor(private val cityRepository: Cit
         }
     }
 
+    /**
+     * Mark cityEntity as selected in the db
+     * @param cityEntity [CityEntity] to saved
+     */
     fun saveSelectedCity(cityEntity: CityEntity) {
         launch {
             cityRepository.saveSelectedCity(cityEntity.id)
@@ -88,7 +92,7 @@ class CitySelectionViewModel @Inject constructor(private val cityRepository: Cit
                     .subscribe({
                         citySelectedLivaData.value = true
                     }, {
-                        // TODO handle error here
+                        onError(it)
                     })
         }
     }

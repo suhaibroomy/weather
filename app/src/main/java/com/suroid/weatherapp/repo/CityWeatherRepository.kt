@@ -15,22 +15,20 @@ import io.reactivex.Single
  */
 class CityWeatherRepository(private val cityRepo: CityRepository, private val cityWeatherDao: CityWeatherDao, private val weatherApi: WeatherApi) {
 
-    /**
-     * Save a new cityWeather to the database. This method performs async operation
-     */
-    //TODO subscribe for this
-    fun saveCityWeather(cityWeather: CityWeatherEntity) {
-        cityWeatherDao.insert(cityWeather)
-    }
 
     /**
-     * Load All cityEntity weathers from database
+     * Fetch city weather by id from the db
+     * @param cityEntity [CityEntity] to fetched weather for
      */
     fun getCityWeatherByCityId(cityEntity: CityEntity): Single<CityWeatherEntity> {
         return cityWeatherDao.getCityWeatherByCityId(cityEntity.id)
     }
 
-    //TODO description
+    /**
+     * Fetch city weather for provided city from api and save/update it in the db
+     * @param cityEntity [CityEntity] city to be fetched weather for
+     * @return [Single] to subscribe
+     */
     fun fetchWeatherOfCity(cityEntity: CityEntity): Single<CityWeatherEntity> {
         return weatherApi.getWeatherWithId(cityEntity.id)
                 .map {
@@ -41,7 +39,11 @@ class CityWeatherRepository(private val cityRepo: CityRepository, private val ci
                 }
     }
 
-    //TODO description
+    /**
+     * Fetch city weather for provided location and save it in the db
+     * @param lat [Double] latitude of the location
+     * @param long [Double] Longitude of the location
+     */
     fun fetchWeatherWithLatLong(lat: Double, long: Double): Single<CityWeatherEntity> {
         return weatherApi.getWeatherWithLatLong(lat, long)
                 .doOnSuccess {

@@ -26,6 +26,10 @@ class WeatherCardViewModel @Inject constructor(private val cityWeatherRepository
     val icon: MutableLiveData<Int> = MutableLiveData()
     val image: MutableLiveData<Int> = MutableLiveData()
 
+    /**
+     * Setup this card with the provided city
+     * @param cityEntity [CityEntity] to be setup
+     */
     fun setupWithCity(cityEntity: CityEntity) {
         launch {
             cityWeatherRepository
