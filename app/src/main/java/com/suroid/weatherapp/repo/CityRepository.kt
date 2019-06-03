@@ -38,15 +38,10 @@ class CityRepository(private val cityDao: CityDao, private val selectedCityDao: 
         cityDao.upsert(cityEntity)
     }
 
-    @WorkerThread
-    fun saveSelectedCity(cityId: Int) {
-        selectedCityDao.upsert(SelectedCityEntity(cityId))
-    }
-
     @UiThread
-    fun saveSelectedCityAsync(cityId: Int): Completable {
+    fun saveSelectedCity(cityId: Int): Completable {
         return Completable.fromAction {
-            saveSelectedCity(cityId)
+            selectedCityDao.upsert(SelectedCityEntity(cityId))
         }
     }
 }

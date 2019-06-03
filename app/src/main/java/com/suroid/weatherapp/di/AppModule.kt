@@ -1,12 +1,11 @@
 package com.suroid.weatherapp.di
 
 import android.app.Application
-import androidx.sqlite.db.SupportSQLiteDatabase
+import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import android.content.Context
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.patloew.rxlocation.RxLocation
 import com.suroid.weatherapp.db.CityDao
 import com.suroid.weatherapp.db.CityWeatherDao
 import com.suroid.weatherapp.db.SelectedCityDao
@@ -14,8 +13,8 @@ import com.suroid.weatherapp.db.WeatherDb
 import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.utils.CITIES_JSON_FILE_NAME
 import com.suroid.weatherapp.utils.CITY_ARRAY_LIST_TYPE
+import com.suroid.weatherapp.utils.extensions.objectify
 import com.suroid.weatherapp.utils.loadJSONFromAsset
-import com.suroid.weatherapp.utils.objectify
 import dagger.Module
 import dagger.Provides
 import io.reactivex.Completable
@@ -109,7 +108,7 @@ class AppModule(private val app: Application) {
 
     @Provides
     @Singleton
-    fun provideLocationClient(): FusedLocationProviderClient {
-        return LocationServices.getFusedLocationProviderClient(app)
+    fun provideRxLocation(context: Context): RxLocation {
+        return RxLocation(context)
     }
 }

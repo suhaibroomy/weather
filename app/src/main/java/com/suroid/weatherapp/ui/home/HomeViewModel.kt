@@ -1,8 +1,8 @@
 package com.suroid.weatherapp.ui.home
 
-import androidx.lifecycle.MutableLiveData
 import android.location.Location
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.repo.CityRepository
 import com.suroid.weatherapp.repo.CityWeatherRepository
@@ -23,15 +23,16 @@ class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityW
     val fetchCityResult: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
-        compositeDisposable.add(
-                cityRepository.getSelectedCities()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            onCitiesFetched(it)
-                        }, {
-                            onError(it)
-                        }))
+        launch {
+            cityRepository.getSelectedCities()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        onCitiesFetched(it)
+                    }, {
+                        onError(it)
+                    })
+        }
     }
 
     private fun onCitiesFetched(cityList: List<CityEntity>) {
@@ -48,20 +49,23 @@ class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityW
      * @param location location object of the place
      */
     fun fetchForCurrentLocation(location: Location) {
-        compositeDisposable.add(
-                cityWeatherRepository.fetchWeatherWithLatLong(location.latitude, location.longitude)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnSubscribe {
-                            loading.value = true
-                        }
-                        .doFinally {
-                            loading.value = false
-                        }
-                        .doOnSuccess {
-                            cityRepository.saveSelectedCity(it.cityId)
-                        }
-                        .subscribe())
+        launch {
+            cityWeatherRepository.fetchWeatherWithLatLong(location.latitude, location.longitude)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe {
+                        loading.value = true
+                    }
+                    .doFinally {
+                        loading.value = false
+                    }
+                    .doOnSuccess {
+                        cityRepository.saveSelectedCity(it.cityId)
+                                .subscribeOn(Schedulers.io())
+                                .subscribe()
+                    }
+                    .subscribe()
+        }
 
     }
 }

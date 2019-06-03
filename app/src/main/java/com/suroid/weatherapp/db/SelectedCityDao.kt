@@ -5,7 +5,6 @@ import androidx.room.Query
 import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.models.SelectedCityEntity
 import io.reactivex.Flowable
-import io.reactivex.Single
 
 @Dao
 abstract class SelectedCityDao : BaseDao<SelectedCityEntity> {

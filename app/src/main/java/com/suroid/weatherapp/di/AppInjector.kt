@@ -53,13 +53,13 @@ object AppInjector {
         if (activity is HasSupportFragmentInjector) {
             AndroidInjection.inject(activity)
         }
-        if (activity is androidx.fragment.app.FragmentActivity) {
+        if (activity is FragmentActivity) {
             activity.supportFragmentManager
                     .registerFragmentLifecycleCallbacks(
-                            object : androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks() {
+                            object : FragmentManager.FragmentLifecycleCallbacks() {
                                 override fun onFragmentCreated(
-                                        fm: androidx.fragment.app.FragmentManager,
-                                        f: androidx.fragment.app.Fragment,
+                                        fm: FragmentManager,
+                                        f: Fragment,
                                         savedInstanceState: Bundle?
                                 ) {
                                     if (f is Injectable) {

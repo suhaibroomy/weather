@@ -5,20 +5,19 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.suroid.weatherapp.R
 import com.suroid.weatherapp.di.Injectable
 import com.suroid.weatherapp.models.CityEntity
-import com.suroid.weatherapp.models.CityWeatherEntity
-import com.suroid.weatherapp.utils.fadeInImage
+import com.suroid.weatherapp.utils.extensions.fadeInImage
 import com.suroid.weatherapp.utils.setupProgressAnimation
 import kotlinx.android.synthetic.main.fragment_weather_card.*
 import javax.inject.Inject
 
-class WeatherCardFragment : androidx.fragment.app.Fragment(), Injectable {
+class WeatherCardFragment : Fragment(), Injectable {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory

@@ -65,13 +65,13 @@ class TestApp : Application() {
                     is CitySelectionActivity -> activity.viewModelFactory = ViewModelUtil.createFor(citySelectionViewModel)
                 }
 
-                if (activity is androidx.fragment.app.FragmentActivity) {
+                if (activity is FragmentActivity) {
                     activity.supportFragmentManager
                             .registerFragmentLifecycleCallbacks(
-                                    object : androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks() {
+                                    object : FragmentManager.FragmentLifecycleCallbacks() {
                                         override fun onFragmentCreated(
-                                                fm: androidx.fragment.app.FragmentManager,
-                                                f: androidx.fragment.app.Fragment,
+                                                fm: FragmentManager,
+                                                f: Fragment,
                                                 savedInstanceState: Bundle?
                                         ) {
                                             if (f is WeatherCardFragment) {

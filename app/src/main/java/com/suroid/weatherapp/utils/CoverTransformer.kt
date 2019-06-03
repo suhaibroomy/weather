@@ -6,7 +6,7 @@ import android.view.View
 private const val SCALE_MIN = 0.3f
 private const val SCALE_MAX = 1f
 
-class CoverTransformer(private val scale: Float) : androidx.viewpager.widget.ViewPager.PageTransformer {
+class CoverTransformer(private val scale: Float) : ViewPager.PageTransformer {
 
     override fun transformPage(page: View, position: Float) {
 

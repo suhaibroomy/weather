@@ -27,42 +27,45 @@ class WeatherCardViewModel @Inject constructor(private val cityWeatherRepository
     val image: MutableLiveData<Int> = MutableLiveData()
 
     fun setupWithCity(cityEntity: CityEntity) {
-        compositeDisposable.add(cityWeatherRepository
-                .getCityWeatherByCityId(cityEntity)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe {
-                    loadingStatus.value = true
-                }
-                .doOnSuccess {
-                    loadingStatus.value = false
-                }
-                .subscribe({
-                    updateValues(it, cityEntity)
-                    if (currentTimeInSeconds() - it.date >= WEATHER_EXPIRY_THRESHOLD_TIME) {
-                        updateCityWeather(cityEntity)
+        launch {
+            cityWeatherRepository
+                    .getCityWeatherByCityId(cityEntity)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe {
+                        loadingStatus.value = true
                     }
-                }, {
-                    updateCityWeather(cityEntity)
-                }))
+                    .doOnSuccess {
+                        loadingStatus.value = false
+                    }
+                    .subscribe({
+                        updateValues(it, cityEntity)
+                        if (currentTimeInSeconds() - it.date >= WEATHER_EXPIRY_THRESHOLD_TIME) {
+                            updateCityWeather(cityEntity)
+                        }
+                    }, {
+                        updateCityWeather(cityEntity)
+                    })
+        }
     }
 
     private fun updateCityWeather(cityEntity: CityEntity) {
-        compositeDisposable.add(
-                cityWeatherRepository.fetchWeatherOfCity(cityEntity)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnSubscribe {
-                            loadingStatus.value = true
-                        }
-                        .doFinally {
-                            loadingStatus.value = false
-                        }
-                        .subscribe({
-                            updateValues(it, cityEntity)
-                        }, {
-                            print(it.localizedMessage)
-                        }))
+        launch {
+            cityWeatherRepository.fetchWeatherOfCity(cityEntity)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe {
+                        loadingStatus.value = true
+                    }
+                    .doFinally {
+                        loadingStatus.value = false
+                    }
+                    .subscribe({
+                        updateValues(it, cityEntity)
+                    }, {
+                        print(it.localizedMessage)
+                    })
+        }
 
     }
 

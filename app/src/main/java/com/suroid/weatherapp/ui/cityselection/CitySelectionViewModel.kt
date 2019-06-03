@@ -1,7 +1,7 @@
 package com.suroid.weatherapp.ui.cityselection
 
-import androidx.lifecycle.MutableLiveData
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.repo.CityRepository
 import com.suroid.weatherapp.utils.LiveEvent
@@ -20,20 +20,21 @@ class CitySelectionViewModel @Inject constructor(private val cityRepository: Cit
 
     val queryText: MutableLiveData<String> = MutableLiveData()
     val cityEntityListLiveData: MutableLiveData<List<CityEntity>> = MutableLiveData()
-    val citySelectedLivaData =  LiveEvent<Boolean>()
+    val citySelectedLivaData = LiveEvent<Boolean>()
     private val cityEntityList: ArrayList<CityEntity> = ArrayList()
 
 
     init {
-        val cityListDisposable = cityRepository.getAllCities()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    onCitiesFetched(it)
-                }, {
-                    onError(it)
-                })
-        compositeDisposable.add(cityListDisposable)
+        launch {
+            cityRepository.getAllCities()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        onCitiesFetched(it)
+                    }, {
+                        onError(it)
+                    })
+        }
     }
 
     private fun onError(throwable: Throwable) {
@@ -59,37 +60,37 @@ class CitySelectionViewModel @Inject constructor(private val cityRepository: Cit
      * @param query Query to be searched
      */
     fun searchForCities(query: String) {
-        compositeDisposable.add(
-                Observable.just(query)
-                        .flatMapSingle {
-                            if (it.isEmpty()) {
-                                cityRepository.getAllCities()
-                            } else {
-                                cityRepository.searchForCity("$query%")
-                            }
+        launch {
+            Observable.just(query)
+                    .flatMapSingle {
+                        if (it.isEmpty()) {
+                            cityRepository.getAllCities()
+                        } else {
+                            cityRepository.searchForCity("$query%")
                         }
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            cityEntityListLiveData.value = it
-                        }, {
-                            onError(it)
-                        })
+                    }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        cityEntityListLiveData.value = it
+                    }, {
+                        onError(it)
+                    })
 
-        )
+        }
     }
 
     fun saveSelectedCity(cityEntity: CityEntity) {
-        compositeDisposable.add(
-                cityRepository.saveSelectedCityAsync(cityEntity.id)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            citySelectedLivaData.value = true
-                        }, {
-                            // TODO handle error here
-                        })
-        )
+        launch {
+            cityRepository.saveSelectedCity(cityEntity.id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        citySelectedLivaData.value = true
+                    }, {
+                        // TODO handle error here
+                    })
+        }
     }
 }
 
