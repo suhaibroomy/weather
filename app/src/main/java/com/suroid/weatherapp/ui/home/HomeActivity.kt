@@ -16,11 +16,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.jakewharton.rxbinding2.view.RxView
-import com.patloew.rxlocation.RxLocation
 import com.suroid.weatherapp.R
 import com.suroid.weatherapp.ui.cityselection.CitySelectionActivity
 import com.suroid.weatherapp.utils.CoverTransformer
-import com.suroid.weatherapp.utils.Errors
 import com.suroid.weatherapp.utils.extensions.setAllOnClickListener
 import com.suroid.weatherapp.utils.extensions.showPermissionDialog
 import com.suroid.weatherapp.utils.extensions.showToast
@@ -28,7 +26,6 @@ import com.suroid.weatherapp.utils.setupProgressAnimation
 import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
-import io.reactivex.Maybe
 import kotlinx.android.synthetic.main.activity_home.*
 import javax.inject.Inject
 
@@ -46,9 +43,6 @@ class HomeActivity : AppCompatActivity(), HasSupportFragmentInjector {
     private lateinit var adapter: HomeViewPagerAdapter
 
     private var animationSet = AnimatorSet()
-
-    @Inject
-    lateinit var rxLocation: RxLocation
 
     private val rxPermissions = RxPermissions(this)
 
@@ -104,10 +98,8 @@ class HomeActivity : AppCompatActivity(), HasSupportFragmentInjector {
             }
         })
 
-        viewModel.fetchCityResult.observe(this, Observer {
-            if (it == false) {
-                showToast(R.string.cannot_find_location)
-            }
+        viewModel.showErrorMessage.observe(this, Observer {
+            showToast(it)
         })
     }
 
@@ -129,30 +121,19 @@ class HomeActivity : AppCompatActivity(), HasSupportFragmentInjector {
     private fun setClickListener(view: View) {
         RxView.clicks(view)
                 .compose(rxPermissions.ensureEach(Manifest.permission.ACCESS_COARSE_LOCATION))
-
-                .flatMapMaybe { permission ->
+                .takeUntil(RxView.detaches(view))
+                .subscribe { permission ->
                     if (permission.granted) {
-                        rxLocation.location().lastLocation()
+                        viewModel.fetchForCurrentLocation()
                     } else {
-                        showPermissionDialog(permission.shouldShowRequestPermissionRationale) {
+                        showPermissionDialog(permission.shouldShowRequestPermissionRationale, {
+                            view.performClick()
+                        }, {
                             showToast(R.string.permission_error)
-                        }
-                        Maybe.error(Errors.PermissionError("Could not find location"))
+                        })
                     }
                 }
-                .takeUntil(RxView.detaches(view))
-                .subscribe({ location ->
-                    location?.let {
-                        viewModel.fetchForCurrentLocation(location = it)
-                    } ?: run { showToast(R.string.cannot_find_location) }
-                }, {
-                    if (it !is Errors) {
-                        showToast(R.string.please_check_gps)
-                    }
-                    // Resubscribe to clicks on error
-                    setClickListener(view)
 
-                })
     }
 
     override fun supportFragmentInjector() = dispatchingAndroidInjector

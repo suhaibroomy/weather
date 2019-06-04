@@ -1,26 +1,31 @@
 package com.suroid.weatherapp.ui.home
 
-import android.location.Location
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.patloew.rxlocation.*
 import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.repo.CityRepository
 import com.suroid.weatherapp.repo.CityWeatherRepository
+import com.suroid.weatherapp.utils.LiveEvent
 import com.suroid.weatherapp.utils.Mockable
 import com.suroid.weatherapp.viewmodel.BaseViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import com.suroid.weatherapp.R
 import javax.inject.Inject
 
 /**
  * @Inject Injects the required [CityWeatherRepository] in this ViewModel.
  */
 @Mockable
-class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityWeatherRepository, private val cityRepository: CityRepository) : BaseViewModel() {
+class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityWeatherRepository,
+                                        private val cityRepository: CityRepository,
+                                        private val rxLocation: RxLocation) : BaseViewModel() {
 
     val cityListLiveData: MutableLiveData<ArrayList<CityEntity>> = MutableLiveData()
     val loading: MutableLiveData<Boolean> = MutableLiveData()
-    val fetchCityResult: MutableLiveData<Boolean> = MutableLiveData()
+    val showErrorMessage: LiveEvent<Int> = LiveEvent()
 
     init {
         launch {
@@ -45,12 +50,20 @@ class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityW
     }
 
     /**
-     * fetches the cityWeather for the location provided
+     * fetches the location and cityWeather for the current location
      * @param location location object of the place
      */
-    fun fetchForCurrentLocation(location: Location) {
+    @SuppressLint("MissingPermission")
+    fun fetchForCurrentLocation() {
         launch {
-            cityWeatherRepository.fetchWeatherWithLatLong(location.latitude, location.longitude)
+            rxLocation.location().lastLocation()
+                    .flatMapSingle {
+                        cityWeatherRepository.fetchWeatherWithLatLong(it.latitude, it.longitude)
+                    }
+                    .flatMapCompletable {
+                        cityRepository.saveSelectedCity(it.cityId)
+                    }
+
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnSubscribe {
@@ -59,10 +72,12 @@ class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityW
                     .doFinally {
                         loading.value = false
                     }
-                    .doOnSuccess {
-                        cityRepository.saveSelectedCity(it.cityId)
-                                .subscribeOn(Schedulers.io())
-                                .subscribe()
+                    .doOnError {
+                        if (it is StatusException || it is GoogleApiConnectionException || it is GoogleApiConnectionSuspendedException) {
+                            showErrorMessage.value = R.string.please_check_gps
+                        } else {
+                            showErrorMessage.value = R.string.cannot_find_location
+                        }
                     }
                     .subscribe()
         }

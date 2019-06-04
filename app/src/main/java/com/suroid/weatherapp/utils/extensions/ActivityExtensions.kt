@@ -7,12 +7,12 @@ import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import com.suroid.weatherapp.R
 
-fun Activity.showPermissionDialog(showRationale: Boolean, cancel: () -> Unit) {
+fun Activity.showPermissionDialog(showRationale: Boolean, retry: () -> Unit, cancel: () -> Unit) {
     if (showRationale) {
         AlertDialog.Builder(this)
                 .setTitle(getString(R.string.permissions_needed_dialog_title))
                 .setMessage(getString(R.string.permissions_rationale_dialog_message))
-                .setPositiveButton(R.string.retry) { _, _ -> }
+                .setPositiveButton(R.string.retry) { _, _ -> retry() }
                 .setNegativeButton(R.string.cancel) { _, _ -> cancel() }
                 .create()
                 .show()
