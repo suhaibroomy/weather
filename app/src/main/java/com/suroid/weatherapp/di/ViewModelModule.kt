@@ -1,7 +1,7 @@
 package com.suroid.weatherapp.di
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.suroid.weatherapp.ui.cityselection.CitySelectionViewModel
 import com.suroid.weatherapp.ui.home.HomeViewModel
 import com.suroid.weatherapp.ui.weathercards.WeatherCardViewModel

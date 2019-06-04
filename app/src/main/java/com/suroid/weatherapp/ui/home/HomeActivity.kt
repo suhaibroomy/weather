@@ -3,28 +3,32 @@ package com.suroid.weatherapp.ui.home
 import android.Manifest
 import android.animation.AnimatorSet
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.ActivityOptionsCompat
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewCompat
-import android.support.v7.app.AppCompatActivity
 import android.view.View
-import com.google.android.gms.location.FusedLocationProviderClient
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
+import com.jakewharton.rxbinding2.view.RxView
 import com.suroid.weatherapp.R
-import com.suroid.weatherapp.models.City
 import com.suroid.weatherapp.ui.cityselection.CitySelectionActivity
-import com.suroid.weatherapp.utils.*
+import com.suroid.weatherapp.utils.CoverTransformer
+import com.suroid.weatherapp.utils.extensions.setAllOnClickListener
+import com.suroid.weatherapp.utils.extensions.showPermissionDialog
+import com.suroid.weatherapp.utils.extensions.showToast
+import com.suroid.weatherapp.utils.setupProgressAnimation
+import com.tbruyelle.rxpermissions2.RxPermissions
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_home.*
 import javax.inject.Inject
+
 
 class HomeActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
@@ -40,8 +44,7 @@ class HomeActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     private var animationSet = AnimatorSet()
 
-    @Inject
-    lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val rxPermissions = RxPermissions(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +73,7 @@ class HomeActivity : AppCompatActivity(), HasSupportFragmentInjector {
      * Registering observers for related liveData from viewModel
      */
     private fun registerViewModelObservers() {
-        viewModel.cityWeatherListLiveData.observe(this, Observer { cityList ->
+        viewModel.cityListLiveData.observe(this, Observer { cityList ->
             cityList?.let {
                 if (it.isNotEmpty()) {
                     group_welcome.visibility = View.GONE
@@ -95,10 +98,8 @@ class HomeActivity : AppCompatActivity(), HasSupportFragmentInjector {
             }
         })
 
-        viewModel.fetchCityResult.observe(this, Observer {
-            if (it == false) {
-                showToast(R.string.cannot_find_location)
-            }
+        viewModel.showErrorMessage.observe(this, Observer {
+            showToast(it)
         })
     }
 
@@ -113,43 +114,26 @@ class HomeActivity : AppCompatActivity(), HasSupportFragmentInjector {
             ActivityCompat.startActivityForResult(this@HomeActivity, intent, 0, options.toBundle())
         }
 
-        iv_welcome.setOnClickListener {
-            requestLocation()
-        }
-
-        tv_welcome.setOnClickListener {
-            requestLocation()
-        }
+        group_welcome.setAllOnClickListener(::setClickListener)
     }
 
-    @SuppressLint("MissingPermission")
-    private fun requestLocation() {
-        if (checkAndAskPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)) {
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                location?.let {
-                    viewModel.fetchForCurrentLocation(location = it)
-                } ?: run { showToast(R.string.cannot_find_location) }
-            }.addOnFailureListener {
-                showToast(R.string.please_check_gps)
-            }
-        }
-    }
+    @SuppressLint("CheckResult", "MissingPermission")
+    private fun setClickListener(view: View) {
+        RxView.clicks(view)
+                .compose(rxPermissions.ensureEach(Manifest.permission.ACCESS_COARSE_LOCATION))
+                .takeUntil(RxView.detaches(view))
+                .subscribe { permission ->
+                    if (permission.granted) {
+                        viewModel.fetchForCurrentLocation()
+                    } else {
+                        showPermissionDialog(permission.shouldShowRequestPermissionRationale, {
+                            view.performClick()
+                        }, {
+                            showToast(R.string.permission_error)
+                        })
+                    }
+                }
 
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        handlePermissionResult(Manifest.permission.ACCESS_COARSE_LOCATION) {
-            requestLocation()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            data?.getParcelableExtra<City>(CITY_MODEL)?.let {
-                viewModel.saveNewCity(it)
-            }
-        }
     }
 
     override fun supportFragmentInjector() = dispatchingAndroidInjector

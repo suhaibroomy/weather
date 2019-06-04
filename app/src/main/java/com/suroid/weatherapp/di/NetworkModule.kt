@@ -1,7 +1,7 @@
 package com.suroid.weatherapp.di
 
-import com.suroid.weatherapp.api.WeatherApi
 import com.suroid.weatherapp.BuildConfig
+import com.suroid.weatherapp.api.WeatherApi
 import com.suroid.weatherapp.utils.BASE_URL
 import dagger.Module
 import dagger.Provides

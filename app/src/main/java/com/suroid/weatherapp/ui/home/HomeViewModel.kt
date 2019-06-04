@@ -1,69 +1,47 @@
 package com.suroid.weatherapp.ui.home
 
 import android.annotation.SuppressLint
-import android.arch.lifecycle.MutableLiveData
-import android.location.Location
 import android.util.Log
-import com.suroid.weatherapp.viewmodel.BaseViewModel
-import com.suroid.weatherapp.models.City
-import com.suroid.weatherapp.models.CityWeatherEntity
-import com.suroid.weatherapp.models.WeatherModel
-import com.suroid.weatherapp.models.remote.ResponseStatus
+import androidx.lifecycle.MutableLiveData
+import com.patloew.rxlocation.*
+import com.suroid.weatherapp.models.CityEntity
+import com.suroid.weatherapp.repo.CityRepository
 import com.suroid.weatherapp.repo.CityWeatherRepository
+import com.suroid.weatherapp.utils.LiveEvent
 import com.suroid.weatherapp.utils.Mockable
+import com.suroid.weatherapp.viewmodel.BaseViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import com.suroid.weatherapp.R
 import javax.inject.Inject
 
 /**
  * @Inject Injects the required [CityWeatherRepository] in this ViewModel.
  */
 @Mockable
-class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityWeatherRepository) : BaseViewModel() {
+class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityWeatherRepository,
+                                        private val cityRepository: CityRepository,
+                                        private val rxLocation: RxLocation) : BaseViewModel() {
 
-    val cityWeatherListLiveData: MutableLiveData<ArrayList<CityWeatherEntity>> = MutableLiveData()
+    val cityListLiveData: MutableLiveData<ArrayList<CityEntity>> = MutableLiveData()
     val loading: MutableLiveData<Boolean> = MutableLiveData()
-    val fetchCityResult: MutableLiveData<Boolean> = MutableLiveData()
+    val showErrorMessage: LiveEvent<Int> = LiveEvent()
 
     init {
-        compositeDisposable.add(cityWeatherRepository.getAllCityWeathers()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    onCitiesFetched(it)
-                }, {
-                    onError(it)
-                }))
-
-        compositeDisposable.add(cityWeatherRepository.responseSubject.subscribe { response ->
-            when (response) {
-                is ResponseStatus.Progress -> {
-                    if (response.tag == UNKNOWN_CITY) {
-                        loading.value = response.loading
-                    }
-                }
-                is ResponseStatus.Success -> {
-                    cityWeatherListLiveData.value?.let {
-                        val pos = it.indexOf(response.data)
-                        if (pos > -1) {
-                            it[pos] = response.data
-                        } else {
-                            it.add(response.data)
-                            cityWeatherListLiveData.value = it
-                        }
-                    }
-                }
-                is ResponseStatus.Failure -> {
-                    if (response.tag == UNKNOWN_CITY) {
-                        fetchCityResult.value = false
-                    }
-                }
-            }
-        })
+        launch {
+            cityRepository.getSelectedCities()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        onCitiesFetched(it)
+                    }, {
+                        onError(it)
+                    })
+        }
     }
 
-    private fun onCitiesFetched(cityWeatherList: List<CityWeatherEntity>) {
-        cityWeatherListLiveData.value = ArrayList(cityWeatherList)
+    private fun onCitiesFetched(cityList: List<CityEntity>) {
+        cityListLiveData.value = ArrayList(cityList)
     }
 
     private fun onError(t: Throwable?) {
@@ -72,32 +50,37 @@ class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityW
     }
 
     /**
-     * Saves the provided city in WeatherDb
-     * @param city city to be added
-     */
-    fun saveNewCity(city: City) {
-        val cityWeather = CityWeatherEntity(id = city.id, city = city, currentWeather = WeatherModel())
-        cityWeatherListLiveData.value?.let {
-            if (!it.contains(cityWeather)) {
-                cityWeatherRepository.saveCityWeather(cityWeather)
-                it.add(cityWeather)
-                cityWeatherListLiveData.value = it
-            }
-        }
-    }
-
-
-    /**
-     * Saves the provided city in WeatherDb
-     * @param city city to be added
+     * fetches the location and cityWeather for the current location
+     * @param location location object of the place
      */
     @SuppressLint("MissingPermission")
-    fun fetchForCurrentLocation(location: Location) {
-        cityWeatherRepository.fetchWeatherWithLatLong(location.latitude, location.longitude, UNKNOWN_CITY)
+    fun fetchForCurrentLocation() {
+        launch {
+            rxLocation.location().lastLocation()
+                    .flatMapSingle {
+                        cityWeatherRepository.fetchWeatherWithLatLong(it.latitude, it.longitude)
+                    }
+                    .flatMapCompletable {
+                        cityRepository.saveSelectedCity(it.cityId)
+                    }
 
-    }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .doOnSubscribe {
+                        loading.value = true
+                    }
+                    .doFinally {
+                        loading.value = false
+                    }
+                    .doOnError {
+                        if (it is StatusException || it is GoogleApiConnectionException || it is GoogleApiConnectionSuspendedException) {
+                            showErrorMessage.value = R.string.please_check_gps
+                        } else {
+                            showErrorMessage.value = R.string.cannot_find_location
+                        }
+                    }
+                    .subscribe()
+        }
 
-    companion object {
-        const val UNKNOWN_CITY = -1
     }
 }

@@ -1,8 +1,8 @@
 package com.suroid.weatherapp.ui.cityselection
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
-import android.arch.lifecycle.Observer
-import com.suroid.weatherapp.models.City
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Observer
+import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.repo.CityRepository
 import com.suroid.weatherapp.util.RxImmediateSchedulerRule
 import com.suroid.weatherapp.util.createCity
@@ -19,7 +19,7 @@ import org.mockito.Mockito
 import java.util.function.Predicate
 
 @RunWith(JUnit4::class)
-class CitySelectionViewModelTest {
+class CityEntitySelectionViewModelTest {
     @Rule
     @JvmField
     val schedulers = RxImmediateSchedulerRule()
@@ -32,11 +32,11 @@ class CitySelectionViewModelTest {
 
     private lateinit var viewModel: CitySelectionViewModel
 
-    private val cityList = ArrayList<City>().apply {
+    private val cityList = ArrayList<CityEntity>().apply {
         add(createCity())
     }
 
-    private val observer = mock<Observer<List<City>>>()
+    private val observer = mock<Observer<List<CityEntity>>>()
 
     @Before
     fun setUp() {
@@ -44,7 +44,7 @@ class CitySelectionViewModelTest {
         viewModel = CitySelectionViewModel(cityRepository)
 
 
-        viewModel.cityListLiveData.observeForever(observer)
+        viewModel.cityEntityListLiveData.observeForever(observer)
         Mockito.verify(observer).onChanged(cityList)
         Mockito.reset(observer)
     }
@@ -52,7 +52,7 @@ class CitySelectionViewModelTest {
     @Test
     fun searchFailTest() {
         viewModel.searchForCities("abcd")
-        Mockito.verify(observer).onChanged(argThat(matches(Predicate<ArrayList<City>> {
+        Mockito.verify(observer).onChanged(argThat(matches(Predicate<ArrayList<CityEntity>> {
             it.isEmpty()
         })))
     }
@@ -60,18 +60,18 @@ class CitySelectionViewModelTest {
     @Test
     fun searchSuccessTest() {
         viewModel.searchForCities("name")
-        Mockito.verify(observer).onChanged(argThat(matches(Predicate<ArrayList<City>> {
+        Mockito.verify(observer).onChanged(argThat(matches(Predicate<ArrayList<CityEntity>> {
             it.size == 1
         })))
     }
 
     @Test
     fun resetAfterSearchTest() {
-        viewModel.cityListLiveData.value = arrayListOf()
+        viewModel.cityEntityListLiveData.value = arrayListOf()
         val queryStringObserver = mock<Observer<String>>()
         viewModel.queryText.observeForever(queryStringObserver)
         viewModel.refreshData()
-        Mockito.verify(observer).onChanged(argThat(matches(Predicate<ArrayList<City>> {
+        Mockito.verify(observer).onChanged(argThat(matches(Predicate<ArrayList<CityEntity>> {
             it.size == 1
         })))
         Mockito.verify(queryStringObserver).onChanged("")

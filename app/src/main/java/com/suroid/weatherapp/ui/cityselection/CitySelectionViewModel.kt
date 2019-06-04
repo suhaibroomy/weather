@@ -1,64 +1,40 @@
 package com.suroid.weatherapp.ui.cityselection
 
-import android.arch.lifecycle.MutableLiveData
 import android.util.Log
-import com.suroid.weatherapp.models.City
+import androidx.lifecycle.MutableLiveData
+import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.repo.CityRepository
+import com.suroid.weatherapp.utils.LiveEvent
 import com.suroid.weatherapp.utils.Mockable
 import com.suroid.weatherapp.viewmodel.BaseViewModel
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
  * @Inject Injects the required [CityRepository] in this ViewModel.
  */
 @Mockable
-class CitySelectionViewModel @Inject constructor(cityRepository: CityRepository) : BaseViewModel() {
+class CitySelectionViewModel @Inject constructor(private val cityRepository: CityRepository) : BaseViewModel() {
 
     val queryText: MutableLiveData<String> = MutableLiveData()
-    val cityListLiveData: MutableLiveData<List<City>> = MutableLiveData()
-    private val cityList: ArrayList<City> = ArrayList()
-    private val searchResultsSubject = PublishSubject.create<String>()
+    val cityEntityListLiveData: MutableLiveData<List<CityEntity>> = MutableLiveData()
+    val citySelectedLivaData = LiveEvent<Boolean>()
+    private val cityEntityList: ArrayList<CityEntity> = ArrayList()
+
 
     init {
-        val cityListDisposable = cityRepository.getAllCities()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    onCitiesFetched(it)
-                }, {
-                    onError(it)
-                })
-        compositeDisposable.add(cityListDisposable)
-
-        val searchDisposable = searchResultsSubject
-                .debounce(200, TimeUnit.MILLISECONDS)
-                .filter {
-                    if (it.isEmpty()) {
-                        cityListLiveData.postValue(cityList)
-                        return@filter false
-                    } else {
-                        return@filter true
-                    }
-                }
-                .map {
-                    it.toLowerCase()
-                }
-                .switchMap {
-                    Observable.just(cityList.filter { city ->
-                        city.name.toLowerCase().contains(it)
+        launch {
+            cityRepository.getAllCities()
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        onCitiesFetched(it)
+                    }, {
+                        onError(it)
                     })
-                }
-                .subscribeOn(Schedulers.single())
-                .observeOn(AndroidSchedulers.mainThread())
-
-        compositeDisposable.add(searchDisposable.subscribe {
-            cityListLiveData.value = it
-        })
+        }
     }
 
     private fun onError(throwable: Throwable) {
@@ -66,9 +42,9 @@ class CitySelectionViewModel @Inject constructor(cityRepository: CityRepository)
         Log.d(CitySelectionViewModel::class.java.name, throwable.message)
     }
 
-    private fun onCitiesFetched(cityList: List<City>) {
-        this.cityList.addAll(cityList)
-        cityListLiveData.value = cityList
+    private fun onCitiesFetched(cityEntityList: List<CityEntity>) {
+        this.cityEntityList.addAll(cityEntityList)
+        cityEntityListLiveData.value = cityEntityList
     }
 
     /**
@@ -76,15 +52,49 @@ class CitySelectionViewModel @Inject constructor(cityRepository: CityRepository)
      */
     fun refreshData() {
         queryText.value = ""
-        cityListLiveData.value = cityList
+        cityEntityListLiveData.value = cityEntityList
     }
 
     /**
      * Search for the city corresponding to the query
-     * @param query Query to be searched
+     * @param query [String]Query to be searched
      */
     fun searchForCities(query: String) {
-        searchResultsSubject.onNext(query)
+        launch {
+            Observable.just(query)
+                    .flatMapSingle {
+                        if (it.isEmpty()) {
+                            cityRepository.getAllCities()
+                        } else {
+                            cityRepository.searchForCity("$query%")
+                        }
+                    }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        cityEntityListLiveData.value = it
+                    }, {
+                        onError(it)
+                    })
+
+        }
+    }
+
+    /**
+     * Mark cityEntity as selected in the db
+     * @param cityEntity [CityEntity] to saved
+     */
+    fun saveSelectedCity(cityEntity: CityEntity) {
+        launch {
+            cityRepository.saveSelectedCity(cityEntity.id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        citySelectedLivaData.value = true
+                    }, {
+                        onError(it)
+                    })
+        }
     }
 }
 

@@ -3,6 +3,7 @@ package com.suroid.weatherapp.di
 import com.suroid.weatherapp.api.WeatherApi
 import com.suroid.weatherapp.db.CityDao
 import com.suroid.weatherapp.db.CityWeatherDao
+import com.suroid.weatherapp.db.SelectedCityDao
 import com.suroid.weatherapp.repo.CityRepository
 import com.suroid.weatherapp.repo.CityWeatherRepository
 import dagger.Module
@@ -23,8 +24,8 @@ class RepositoryModule {
      */
     @Provides
     @Singleton
-    fun providesCityRepository(cityDao: CityDao): CityRepository {
-        return CityRepository(cityDao)
+    fun providesCityRepository(cityDao: CityDao, selectedCityDao: SelectedCityDao): CityRepository {
+        return CityRepository(cityDao, selectedCityDao)
     }
 
     /**
@@ -35,7 +36,7 @@ class RepositoryModule {
      */
     @Provides
     @Singleton
-    fun providesCityWeatherRepository(cityWeatherDao: CityWeatherDao, api: WeatherApi): CityWeatherRepository {
-        return CityWeatherRepository(cityWeatherDao, api)
+    fun providesCityWeatherRepository(cityRepo: CityRepository, cityWeatherDao: CityWeatherDao, api: WeatherApi): CityWeatherRepository {
+        return CityWeatherRepository(cityRepo, cityWeatherDao, api)
     }
 }

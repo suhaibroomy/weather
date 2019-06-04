@@ -1,18 +1,18 @@
 package com.suroid.weatherapp.ui.weathercards
 
 import android.animation.AnimatorSet
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.suroid.weatherapp.R
 import com.suroid.weatherapp.di.Injectable
-import com.suroid.weatherapp.models.CityWeatherEntity
-import com.suroid.weatherapp.utils.fadeInImage
+import com.suroid.weatherapp.models.CityEntity
+import com.suroid.weatherapp.utils.extensions.fadeInImage
 import com.suroid.weatherapp.utils.setupProgressAnimation
 import kotlinx.android.synthetic.main.fragment_weather_card.*
 import javax.inject.Inject
@@ -30,7 +30,7 @@ class WeatherCardFragment : Fragment(), Injectable {
 
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(WeatherCardViewModel::class.java)
 
-        arguments?.getParcelable<CityWeatherEntity>(CITY_WEATHER_ENTITY)?.let {
+        arguments?.getParcelable<CityEntity>(CITY_ENTITY)?.let {
             viewModel.setupWithCity(it)
         }
 
@@ -113,19 +113,19 @@ class WeatherCardFragment : Fragment(), Injectable {
 
     companion object {
 
-        private const val CITY_WEATHER_ENTITY = "city_weather_entity"
+        private const val CITY_ENTITY = "city_entity"
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
-         * @param cityWeatherEntity [CityWeatherEntity] instance to be passed.
+         * @param cityEntity [CityEntity] instance to be passed.
          * @return A new instance of fragment [WeatherCardFragment].
          */
         @JvmStatic
-        fun newInstance(cityWeatherEntity: CityWeatherEntity) =
+        fun newInstance(cityEntity: CityEntity) =
                 WeatherCardFragment().apply {
                     arguments = Bundle().apply {
-                        putParcelable(CITY_WEATHER_ENTITY, cityWeatherEntity)
+                        putParcelable(CITY_ENTITY, cityEntity)
                     }
                 }
     }

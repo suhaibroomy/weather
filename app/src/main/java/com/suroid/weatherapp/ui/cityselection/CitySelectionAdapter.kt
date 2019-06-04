@@ -1,14 +1,13 @@
 package com.suroid.weatherapp.ui.cityselection
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.suroid.weatherapp.R
-import com.suroid.weatherapp.WeatherApplication
-import com.suroid.weatherapp.models.City
+import com.suroid.weatherapp.models.CityEntity
 
 /**
  * Adapter for recycler of [CitySelectionActivity] , it can handle grid and list layout
@@ -16,10 +15,10 @@ import com.suroid.weatherapp.models.City
 class CitySelectionAdapter(private val context: Context, private val cityAdapterDelegate: CityAdapterDelegate) : RecyclerView.Adapter<CitySelectionAdapter.CityViewHolder>() {
 
     interface CityAdapterDelegate {
-        fun onItemClick(city: City)
+        fun onItemClick(cityEntity: CityEntity)
     }
 
-    private lateinit var cityList: List<City>
+    private lateinit var cityEntityList: List<CityEntity>
     private var layoutInflater: LayoutInflater = LayoutInflater.from(context)
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): CitySelectionAdapter.CityViewHolder {
@@ -27,22 +26,22 @@ class CitySelectionAdapter(private val context: Context, private val cityAdapter
     }
 
     override fun getItemCount(): Int {
-        return if (::cityList.isInitialized) cityList.size else 0
+        return if (::cityEntityList.isInitialized) cityEntityList.size else 0
     }
 
     override fun onBindViewHolder(viewHolder: CitySelectionAdapter.CityViewHolder, position: Int) {
-        viewHolder.onBind(cityList[position])
+        viewHolder.onBind(cityEntityList[position])
         viewHolder.itemView.setOnClickListener {
-            cityAdapterDelegate.onItemClick(cityList[position])
+            cityAdapterDelegate.onItemClick(cityEntityList[position])
         }
     }
 
     /**
      * Updates the city List and notifies the adapter
-     * @param cityList updated cities list
+     * @param cityEntityList updated cities list
      */
-    fun updateCityList(cityList: List<City>) {
-        this.cityList = cityList
+    fun updateCityList(cityEntityList: List<CityEntity>) {
+        this.cityEntityList = cityEntityList
         notifyDataSetChanged()
     }
 
@@ -51,8 +50,8 @@ class CitySelectionAdapter(private val context: Context, private val cityAdapter
 
         private val tvName = itemView.findViewById<TextView?>(R.id.tv_name)
 
-        fun onBind(city: City) {
-            tvName?.text = tvName?.context?.getString(R.string.city_country_format, city.name, city.country)
+        fun onBind(cityEntity: CityEntity) {
+            tvName?.text = tvName?.context?.getString(R.string.city_country_format, cityEntity.name, cityEntity.country)
         }
 
     }

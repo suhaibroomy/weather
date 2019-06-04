@@ -1,6 +1,6 @@
 package com.suroid.weatherapp.db
 
-import android.arch.persistence.room.*
+import androidx.room.*
 
 
 interface BaseDao<T> {

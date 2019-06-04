@@ -1,7 +1,7 @@
 package com.suroid.weatherapp.db
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Query
+import androidx.room.Dao
+import androidx.room.Query
 import com.suroid.weatherapp.models.CityWeatherEntity
 import io.reactivex.Single
 
@@ -10,8 +10,8 @@ import io.reactivex.Single
 abstract class CityWeatherDao : BaseDao<CityWeatherEntity> {
 
     /**
-     * Get all CityWeathers along with City and forecast.
+     * Get all CityWeathers along with CityEntity and forecast.
      */
-    @Query("SELECT * FROM CityWeatherEntity")
-    abstract fun getAllCityWeathers(): Single<List<CityWeatherEntity>>
+    @Query("SELECT * FROM city_weather WHERE city_id = :id")
+    abstract fun getCityWeatherByCityId(id: Int): Single<CityWeatherEntity>
 }

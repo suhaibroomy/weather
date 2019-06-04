@@ -1,16 +1,16 @@
 package com.suroid.weatherapp.ui.home
 
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 import android.location.Location
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.click
-import android.support.test.espresso.assertion.ViewAssertions
-import android.support.test.espresso.intent.Intents
-import android.support.test.espresso.intent.Intents.intended
-import android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent
-import android.support.test.espresso.matcher.ViewMatchers
-import android.support.test.espresso.matcher.ViewMatchers.*
-import android.support.test.rule.ActivityTestRule
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
+import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.rule.ActivityTestRule
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
@@ -51,9 +51,9 @@ class HomeActivityTest {
             super.beforeActivityLaunched()
             Mockito.`when`(viewModel.loading).thenReturn(loading)
             Mockito.`when`(viewModel.fetchCityResult).thenReturn(fetchCityResult)
-            Mockito.`when`(viewModel.cityWeatherListLiveData).thenReturn(cityWeatherListLiveData)
+            Mockito.`when`(viewModel.cityListLiveData).thenReturn(cityWeatherListLiveData)
 
-            Mockito.`when`(TestApp.citySelectionViewModel.cityListLiveData).thenReturn(MutableLiveData())
+            Mockito.`when`(TestApp.citySelectionViewModel.cityEntityListLiveData).thenReturn(MutableLiveData())
             Mockito.`when`(TestApp.citySelectionViewModel.queryText).thenReturn(MutableLiveData())
 
             Mockito.`when`(TestApp.weatherCardViewModel.loadingStatus).thenReturn(MutableLiveData())
@@ -118,7 +118,7 @@ class HomeActivityTest {
     @Test
     fun addCardTest() {
         val arr = arrayListOf(createCityWeather())
-        viewModel.cityWeatherListLiveData.postValue(arr)
+        viewModel.cityListLiveData.postValue(arr)
         onView(allOf(withId(R.id.weather_card_root))).check(ViewAssertions.matches(isCompletelyDisplayed()))
     }
 

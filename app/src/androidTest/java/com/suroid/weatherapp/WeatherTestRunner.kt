@@ -18,7 +18,7 @@ package com.suroid.weatherapp
 
 import android.app.Application
 import android.content.Context
-import android.support.test.runner.AndroidJUnitRunner
+import androidx.test.runner.AndroidJUnitRunner
 
 /**
  * Custom runner to disable dependency injection.

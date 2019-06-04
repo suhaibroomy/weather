@@ -1,20 +1,20 @@
 package com.suroid.weatherapp.di
 
 import android.app.Application
-import android.arch.persistence.db.SupportSQLiteDatabase
-import android.arch.persistence.room.Room
-import android.arch.persistence.room.RoomDatabase
 import android.content.Context
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.patloew.rxlocation.RxLocation
 import com.suroid.weatherapp.db.CityDao
 import com.suroid.weatherapp.db.CityWeatherDao
+import com.suroid.weatherapp.db.SelectedCityDao
 import com.suroid.weatherapp.db.WeatherDb
-import com.suroid.weatherapp.models.City
+import com.suroid.weatherapp.models.CityEntity
 import com.suroid.weatherapp.utils.CITIES_JSON_FILE_NAME
 import com.suroid.weatherapp.utils.CITY_ARRAY_LIST_TYPE
+import com.suroid.weatherapp.utils.extensions.objectify
 import com.suroid.weatherapp.utils.loadJSONFromAsset
-import com.suroid.weatherapp.utils.objectify
 import dagger.Module
 import dagger.Provides
 import io.reactivex.Completable
@@ -40,8 +40,8 @@ class AppModule(private val app: Application) {
                         //Prepopulate DataBase with list of cities
 
                         Completable.fromCallable {
-                            val cities: List<City>? = loadJSONFromAsset(app, CITIES_JSON_FILE_NAME)?.objectify(CITY_ARRAY_LIST_TYPE)
-                            cities?.let {
+                            val cityEntities: List<CityEntity>? = loadJSONFromAsset(app, CITIES_JSON_FILE_NAME)?.objectify(CITY_ARRAY_LIST_TYPE)
+                            cityEntities?.let {
                                 weatherDb.cityDao().insert(it)
                             }
                         }.subscribeOn(Schedulers.io()).subscribe()
@@ -95,9 +95,20 @@ class AppModule(private val app: Application) {
         return db.cityWeatherDao()
     }
 
+    /**
+     * Provides [SelectedCityDao]
+     * @param db [WeatherDb] is required as parameter
+     * @return [CityWeatherDao]
+     */
+    @Singleton
+    @Provides
+    fun provideSelectedCityDao(db: WeatherDb): SelectedCityDao {
+        return db.selectedCityDao()
+    }
+
     @Provides
     @Singleton
-    fun provideLocationClient(): FusedLocationProviderClient {
-        return LocationServices.getFusedLocationProviderClient(app)
+    fun provideRxLocation(context: Context): RxLocation {
+        return RxLocation(context)
     }
 }

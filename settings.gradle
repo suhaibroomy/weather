@@ -1,1 +1,1 @@
-include ':app', ':com.nailude.ub'
+include ':app'

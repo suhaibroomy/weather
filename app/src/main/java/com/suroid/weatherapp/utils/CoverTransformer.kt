@@ -1,6 +1,6 @@
 package com.suroid.weatherapp.utils
 
-import android.support.v4.view.ViewPager
+import androidx.viewpager.widget.ViewPager
 import android.view.View
 
 private const val SCALE_MIN = 0.3f
