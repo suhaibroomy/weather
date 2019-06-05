@@ -46,6 +46,10 @@ android {
         sourceCompatibility 1.8
         targetCompatibility 1.8
     }
+
+    testOptions {
+        animationsDisabled = true
+    }
 }
 
 dependencies {
@@ -108,6 +112,22 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-android:2.23.0"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
-    androidTestImplementation 'androidx.arch.core:core-testing:2.0.1'
-
+    androidTestImplementation 'androidx.arch.core:core-testing:2.0.0'
 }
+
+// Uncomment these lines to disable animation on an emulator or a rooted device
+
+//def adb = android.getAdbExe().toString()
+//
+//afterEvaluate {
+//    task grantAnimationPermissionDev(type: Exec, dependsOn: 'installDebug') {
+//        commandLine "$adb shell pm grant $android.defaultConfig.applicationId android.permission.SET_ANIMATION_SCALE".split(' ')
+//    }
+//
+//    tasks.each { task ->
+//        if (task.name.startsWith('assembleDebugAndroidTest')) {
+//            task.dependsOn grantAnimationPermissionDev
+//        }
+//    }
+//}
+

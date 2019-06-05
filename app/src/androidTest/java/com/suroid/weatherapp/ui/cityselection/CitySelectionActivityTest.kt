@@ -1,10 +1,13 @@
 package com.suroid.weatherapp.ui.cityselection
 
 import androidx.lifecycle.MutableLiveData
-import androidx.test.rule.ActivityTestRule
+import androidx.test.core.app.ActivityScenario
+import androidx.test.espresso.intent.Intents
 import com.suroid.weatherapp.TestApp
 import com.suroid.weatherapp.models.CityEntity
-import org.junit.Rule
+import com.suroid.weatherapp.utils.LiveEvent
+import org.junit.After
+import org.junit.Before
 import org.mockito.Mockito
 
 class CitySelectionActivityTest {
@@ -12,14 +15,23 @@ class CitySelectionActivityTest {
 
     private val queryText = MutableLiveData<String>()
     private val cityListLiveData = MutableLiveData<List<CityEntity>>()
+    private val citySelectedLivaData = LiveEvent<Boolean>()
 
-    @Rule
-    @JvmField
-    val activityRule = object : ActivityTestRule<CitySelectionActivity>(CitySelectionActivity::class.java) {
-        override fun beforeActivityLaunched() {
-            super.beforeActivityLaunched()
-            Mockito.`when`(viewModel.cityEntityListLiveData).thenReturn(cityListLiveData)
-            Mockito.`when`(viewModel.queryText).thenReturn(queryText)
-        }
+    lateinit var activityScenario: ActivityScenario<CitySelectionActivity>
+
+    @Before
+    fun init() {
+        Mockito.`when`(viewModel.cityEntityListLiveData).thenReturn(cityListLiveData)
+        Mockito.`when`(viewModel.queryText).thenReturn(queryText)
+        Mockito.`when`(TestApp.citySelectionViewModel.citySelectedLivaData).thenReturn(citySelectedLivaData)
+
+        activityScenario = ActivityScenario.launch(CitySelectionActivity::class.java)
+    }
+
+
+    @After
+    fun destroy() {
+        Intents.release()
+        activityScenario.close()
     }
 }

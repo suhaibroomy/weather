@@ -34,8 +34,7 @@ fun createWeatherResponseModel() = createWeatherResponseModel(123)
 fun createCity() = CityEntity(name = "name", country = "country", id = 0)
 
 fun createCityWeather() = CityWeatherEntity(123,
-        WeatherModel("title", "description", TemperatureModel(1.1f, 2.2f, 3.3f), 4f, 5, 6),
-        city = createCity())
+        WeatherModel("title", "description", TemperatureModel(1.1f, 2.2f, 3.3f), 4f, 5, 6))
 
 
 fun <T> matches(predicate: Predicate<T>): ArgumentMatcher<T> {

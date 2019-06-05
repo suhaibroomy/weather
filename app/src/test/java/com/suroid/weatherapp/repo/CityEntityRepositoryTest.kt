@@ -25,4 +25,6 @@ class CityEntityRepositoryTest {
         repo.getAllCities()
         Mockito.verify(cityDao).getAllCities()
     }
+
+    //TODO write some tests
 }
