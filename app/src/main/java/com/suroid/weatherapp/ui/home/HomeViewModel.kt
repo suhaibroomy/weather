@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.patloew.rxlocation.*
-import com.suroid.weatherapp.models.CityEntity
+import com.suroid.weatherapp.models.local.CityEntity
 import com.suroid.weatherapp.repo.CityRepository
 import com.suroid.weatherapp.repo.CityWeatherRepository
 import com.suroid.weatherapp.utils.LiveEvent

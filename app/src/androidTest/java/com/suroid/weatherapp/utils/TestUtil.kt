@@ -3,7 +3,7 @@ package com.suroid.weatherapp.utils
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.espresso.matcher.BoundedMatcher
-import com.suroid.weatherapp.models.CityEntity
+import com.suroid.weatherapp.models.local.CityEntity
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 

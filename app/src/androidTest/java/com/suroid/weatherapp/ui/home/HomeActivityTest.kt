@@ -13,7 +13,7 @@ import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.rule.GrantPermissionRule
 import com.suroid.weatherapp.R
 import com.suroid.weatherapp.TestApp
-import com.suroid.weatherapp.models.CityEntity
+import com.suroid.weatherapp.models.local.CityEntity
 import com.suroid.weatherapp.ui.cityselection.CitySelectionActivity
 import com.suroid.weatherapp.utils.DisableAnimationsRule
 import com.suroid.weatherapp.utils.LiveEvent

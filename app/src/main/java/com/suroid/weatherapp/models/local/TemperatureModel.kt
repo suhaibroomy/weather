@@ -1,4 +1,4 @@
-package com.suroid.weatherapp.models
+package com.suroid.weatherapp.models.local
 
 data class TemperatureModel(
         var temp: Float? = null,

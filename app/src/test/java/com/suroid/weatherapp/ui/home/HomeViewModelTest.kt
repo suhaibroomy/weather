@@ -6,7 +6,7 @@ import com.patloew.rxlocation.FusedLocation
 import com.patloew.rxlocation.RxLocation
 import com.patloew.rxlocation.StatusException
 import com.suroid.weatherapp.R
-import com.suroid.weatherapp.models.CityEntity
+import com.suroid.weatherapp.models.local.CityEntity
 import com.suroid.weatherapp.repo.CityRepository
 import com.suroid.weatherapp.repo.CityWeatherRepository
 import com.suroid.weatherapp.util.RxImmediateSchedulerRule

@@ -21,8 +21,8 @@ import javax.inject.Singleton
 @Suppress("unused")
 class NetworkModule {
     /**
-     * Provides the [WeatherApi] implementation.
-     * @param retrofit the Retrofit object used to instantiate the service
+     * Provides  [WeatherApi] implementation.
+     * @param retrofit [Retrofit] object used to instantiate the service
      * @return [WeatherApi] service implementation.
      */
     @Provides
@@ -32,8 +32,8 @@ class NetworkModule {
     }
 
     /**
-     * Provides the Retrofit object.
-     * @return the Retrofit object
+     * Provides [Retrofit] object for networking.
+     * @return [Retrofit] object
      */
     @Provides
     @Singleton
@@ -46,6 +46,10 @@ class NetworkModule {
                 .build()
     }
 
+    /**
+     * Provides [OkHttpClient] for network calls
+     * @return [OkHttpClient] ]the OkHttpClient object
+     */
     @Provides
     @Singleton
     fun providesOkHttpClient(): OkHttpClient {

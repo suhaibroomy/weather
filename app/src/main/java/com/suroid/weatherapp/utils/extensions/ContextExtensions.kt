@@ -7,6 +7,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.annotation.UiThread
+import java.io.IOException
+import java.nio.charset.Charset
 
 @UiThread
 fun Context.showToast(@StringRes message: Int) {
@@ -28,4 +30,18 @@ fun Context.showToast(@StringRes message: Int) {
         it.gravity = Gravity.CENTER_HORIZONTAL
     }
     toast.show()
+}
+
+fun Context.loadJSONFromAsset(fileName: String): String? {
+    return try {
+        val inputStream = assets.open(fileName)
+        val size = inputStream.available()
+        val buffer = ByteArray(size)
+        inputStream.read(buffer)
+        inputStream.close()
+        String(buffer, Charset.defaultCharset())
+    } catch (ex: IOException) {
+        ex.printStackTrace()
+        null
+    }
 }

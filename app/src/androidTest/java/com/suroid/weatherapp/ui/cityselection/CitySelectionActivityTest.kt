@@ -11,7 +11,7 @@ import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.*
 import com.suroid.weatherapp.R
 import com.suroid.weatherapp.TestApp
-import com.suroid.weatherapp.models.CityEntity
+import com.suroid.weatherapp.models.local.CityEntity
 import com.suroid.weatherapp.utils.*
 import org.junit.After
 import org.junit.Before

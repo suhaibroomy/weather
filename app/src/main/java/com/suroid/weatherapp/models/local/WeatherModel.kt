@@ -1,4 +1,4 @@
-package com.suroid.weatherapp.models
+package com.suroid.weatherapp.models.local
 
 data class WeatherModel(
         var title: String? = null,

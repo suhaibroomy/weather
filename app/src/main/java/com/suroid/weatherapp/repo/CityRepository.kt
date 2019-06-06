@@ -1,11 +1,10 @@
 package com.suroid.weatherapp.repo
 
-import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import com.suroid.weatherapp.db.CityDao
 import com.suroid.weatherapp.db.SelectedCityDao
-import com.suroid.weatherapp.models.CityEntity
-import com.suroid.weatherapp.models.SelectedCityEntity
+import com.suroid.weatherapp.models.local.CityEntity
+import com.suroid.weatherapp.models.local.SelectedCityEntity
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -57,7 +56,6 @@ class CityRepository(private val cityDao: CityDao, private val selectedCityDao: 
      * @param cityId [Int] id of the city to be saved
      * @return [Completable] to be subscribed for
      */
-    @UiThread
     fun saveSelectedCity(cityId: Int): Completable {
         return Completable.fromAction {
             selectedCityDao.upsert(SelectedCityEntity(cityId))

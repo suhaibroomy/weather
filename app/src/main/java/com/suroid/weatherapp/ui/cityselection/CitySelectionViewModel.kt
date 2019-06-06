@@ -1,8 +1,7 @@
 package com.suroid.weatherapp.ui.cityselection
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.suroid.weatherapp.models.CityEntity
+import com.suroid.weatherapp.models.local.CityEntity
 import com.suroid.weatherapp.repo.CityRepository
 import com.suroid.weatherapp.utils.LiveEvent
 import com.suroid.weatherapp.utils.Mockable

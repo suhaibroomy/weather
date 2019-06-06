@@ -111,7 +111,7 @@ class HomeActivity : AppCompatActivity(), HasSupportFragmentInjector {
             val intent = Intent(this@HomeActivity, CitySelectionActivity::class.java)
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this@HomeActivity, fab, ViewCompat.getTransitionName(fab)
                     ?: "")
-            ActivityCompat.startActivityForResult(this@HomeActivity, intent, 0, options.toBundle())
+            ActivityCompat.startActivity(this@HomeActivity, intent, options.toBundle())
         }
 
         group_welcome.setAllOnClickListener(::setClickListener)

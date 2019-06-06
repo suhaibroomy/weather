@@ -1,8 +1,8 @@
 package com.suroid.weatherapp.util
 
-import com.suroid.weatherapp.models.CityWeatherEntity
-import com.suroid.weatherapp.models.TemperatureModel
-import com.suroid.weatherapp.models.WeatherModel
+import com.suroid.weatherapp.models.local.CityWeatherEntity
+import com.suroid.weatherapp.models.local.TemperatureModel
+import com.suroid.weatherapp.models.local.WeatherModel
 import com.suroid.weatherapp.models.remote.WeatherResponseModel
 import org.mockito.Mockito
 

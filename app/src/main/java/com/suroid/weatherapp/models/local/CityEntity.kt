@@ -1,4 +1,4 @@
-package com.suroid.weatherapp.models
+package com.suroid.weatherapp.models.local
 
 import android.os.Parcelable
 import androidx.room.Entity

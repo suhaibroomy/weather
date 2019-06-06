@@ -8,10 +8,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.suroid.weatherapp.R
+import com.suroid.weatherapp.databinding.FragmentWeatherCardBinding
 import com.suroid.weatherapp.di.Injectable
-import com.suroid.weatherapp.models.CityEntity
+import com.suroid.weatherapp.models.local.CityEntity
 import com.suroid.weatherapp.utils.extensions.fadeInImage
 import com.suroid.weatherapp.utils.setupProgressAnimation
 import kotlinx.android.synthetic.main.fragment_weather_card.*
@@ -23,6 +25,7 @@ class WeatherCardFragment : Fragment(), Injectable {
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private lateinit var viewModel: WeatherCardViewModel
+    private lateinit var binding: FragmentWeatherCardBinding
     private val animationSet = AnimatorSet()
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -34,11 +37,15 @@ class WeatherCardFragment : Fragment(), Injectable {
             viewModel.setupWithCity(it)
         }
 
+        binding.viewModel = viewModel
         registerViewModelObservers()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_weather_card, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_weather_card, container, false)
+        binding.lifecycleOwner = this
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,47 +58,6 @@ class WeatherCardFragment : Fragment(), Injectable {
      * Registering observers for related liveData from viewModel
      */
     private fun registerViewModelObservers() {
-        viewModel.temp.observe(this, Observer { temp ->
-            temp?.let {
-                tv_temp.text = it
-            }
-        })
-
-        viewModel.weatherTitle.observe(this, Observer { weatherTitle ->
-            weatherTitle?.let {
-                tv_temp_description.text = it
-            }
-        })
-
-        viewModel.city.observe(this, Observer { city ->
-            city?.let {
-                tv_city.text = it
-            }
-        })
-
-        viewModel.humidity.observe(this, Observer { humidity ->
-            humidity?.let {
-                tv_humidity_percent.text = it
-            }
-        })
-
-        viewModel.minMaxTemp.observe(this, Observer { minMaxTemp ->
-            minMaxTemp?.let {
-                tv_min_max_temp.text = it
-            }
-        })
-        viewModel.wind.observe(this, Observer { wind ->
-            wind?.let {
-                tv_wind_speed.text = it
-            }
-        })
-
-        viewModel.icon.observe(this, Observer { icon ->
-            icon?.let {
-                iv_weather.setImageResource(it)
-            }
-        })
-
         viewModel.image.observe(this, Observer { icon ->
             icon?.let {
                 iv_background.fadeInImage(it)

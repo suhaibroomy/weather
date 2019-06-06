@@ -37,7 +37,11 @@ interface BaseDao<T> {
     @Delete
     fun delete(obj: T)
 
-
+    /**
+     * Update or Insert an object fom database
+     *
+     * @param obj the object to be updated/inserted
+     */
     @Transaction
     fun upsert(obj: T) {
         val id = insert(obj)

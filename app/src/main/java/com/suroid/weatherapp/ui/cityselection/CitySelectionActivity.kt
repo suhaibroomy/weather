@@ -13,8 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.jakewharton.rxbinding2.view.RxView
 import com.jakewharton.rxbinding2.widget.RxTextView
 import com.suroid.weatherapp.R
-import com.suroid.weatherapp.models.CityEntity
-import com.suroid.weatherapp.utils.*
+import com.suroid.weatherapp.models.local.CityEntity
+import com.suroid.weatherapp.utils.extensions.animateRevealHide
+import com.suroid.weatherapp.utils.extensions.animateRevealShow
+import com.suroid.weatherapp.utils.extensions.hideKeyboard
+import com.suroid.weatherapp.utils.extensions.showKeyboard
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_city_selection.*
@@ -102,19 +105,13 @@ class CitySelectionActivity : AppCompatActivity(), CitySelectionAdapter.CityAdap
             override fun onTransitionEnd(p0: Transition?) {
                 val cx = (activity_root.left + activity_root.right) / 2
                 val cy = (activity_root.top + activity_root.bottom) / 2
-                animateRevealShow(activity_root, fab.width / 2, R.color.bg_color, cx,
-                        cy, object : OnRevealAnimationListener {
-                    override fun onRevealShow() {
-                        fab.hide()
-                        root_layout.animate().alpha(1f).duration = 300
-                        et_search.isFocusableInTouchMode = true
-                        et_search.requestFocus()
-                        showKeyboard(this@CitySelectionActivity, et_search)
-                    }
-
-                    override fun onRevealHide() {
-                    }
-                })
+                activity_root.animateRevealShow(fab.width / 2, R.color.bg_color, cx, cy) {
+                    fab.hide()
+                    root_layout.animate().alpha(1f).duration = 300
+                    et_search.isFocusableInTouchMode = true
+                    et_search.requestFocus()
+                    showKeyboard(et_search)
+                }
             }
 
             override fun onTransitionResume(p0: Transition?) {
@@ -145,19 +142,12 @@ class CitySelectionActivity : AppCompatActivity(), CitySelectionAdapter.CityAdap
      */
     private fun performExit() {
         fab.show()
-        hideKeyboard(this, et_search)
-        animateRevealHide(activity_root, R.color.bg_color, fab.width / 2,
-                object : OnRevealAnimationListener {
+        hideKeyboard(et_search)
+        activity_root.animateRevealHide(R.color.bg_color, fab.width / 2) {
+            root_layout.alpha = 0f
+            ActivityCompat.finishAfterTransition(this@CitySelectionActivity)
 
-                    override fun onRevealShow() {
-                    }
-
-                    override fun onRevealHide() {
-                        root_layout.alpha = 0f
-                        ActivityCompat.finishAfterTransition(this@CitySelectionActivity)
-
-                    }
-                })
+        }
     }
 
     override fun supportFragmentInjector() = dispatchingAndroidInjector

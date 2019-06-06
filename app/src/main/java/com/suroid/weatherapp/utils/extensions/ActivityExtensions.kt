@@ -1,9 +1,12 @@
 package com.suroid.weatherapp.utils.extensions
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AlertDialog
 import com.suroid.weatherapp.R
 
@@ -29,5 +32,27 @@ fun Activity.showPermissionDialog(showRationale: Boolean, retry: () -> Unit, can
                 .setNegativeButton(R.string.cancel) { _, _ -> cancel() }
                 .create()
                 .show()
+    }
+}
+
+fun Activity.hideKeyboard(view: View?) {
+    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    view?.let {
+        imm.hideSoftInputFromWindow(it.windowToken, 0)
+    } ?: run {
+        currentFocus?.let {
+            imm.hideSoftInputFromWindow(it.windowToken, 0)
+        }
+    }
+}
+
+fun Activity.showKeyboard(view: View?) {
+    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    view?.let {
+        imm.showSoftInput(it, InputMethodManager.SHOW_IMPLICIT)
+    } ?: run {
+        currentFocus?.let {
+            imm.showSoftInput(it, InputMethodManager.SHOW_IMPLICIT)
+        }
     }
 }

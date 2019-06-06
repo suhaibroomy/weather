@@ -2,8 +2,8 @@ package com.suroid.weatherapp.db
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.suroid.weatherapp.models.CityEntity
-import com.suroid.weatherapp.models.SelectedCityEntity
+import com.suroid.weatherapp.models.local.CityEntity
+import com.suroid.weatherapp.models.local.SelectedCityEntity
 import io.reactivex.Flowable
 
 @Dao

@@ -11,6 +11,9 @@ import io.reactivex.disposables.Disposable
 abstract class BaseViewModel : ViewModel() {
     private val compositeDisposable = CompositeDisposable()
 
+    /**
+     * Enclose an rx java subscription in a composite disposable
+     */
     fun launch(job: () -> Disposable) {
         compositeDisposable.add(job())
     }

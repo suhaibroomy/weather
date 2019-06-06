@@ -1,8 +1,8 @@
 package com.suroid.weatherapp.ui.weathercards
 
 import androidx.lifecycle.MutableLiveData
-import com.suroid.weatherapp.models.CityEntity
-import com.suroid.weatherapp.models.CityWeatherEntity
+import com.suroid.weatherapp.models.local.CityEntity
+import com.suroid.weatherapp.models.local.CityWeatherEntity
 import com.suroid.weatherapp.repo.CityWeatherRepository
 import com.suroid.weatherapp.utils.*
 import com.suroid.weatherapp.viewmodel.BaseViewModel

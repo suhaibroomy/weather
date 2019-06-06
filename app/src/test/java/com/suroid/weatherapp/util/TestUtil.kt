@@ -1,9 +1,9 @@
 package com.suroid.weatherapp.util
 
-import com.suroid.weatherapp.models.CityEntity
-import com.suroid.weatherapp.models.CityWeatherEntity
-import com.suroid.weatherapp.models.TemperatureModel
-import com.suroid.weatherapp.models.WeatherModel
+import com.suroid.weatherapp.models.local.CityEntity
+import com.suroid.weatherapp.models.local.CityWeatherEntity
+import com.suroid.weatherapp.models.local.TemperatureModel
+import com.suroid.weatherapp.models.local.WeatherModel
 import com.suroid.weatherapp.models.remote.*
 
 fun createWeatherResponseModel(id: Int): WeatherResponseModel {

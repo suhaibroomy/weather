@@ -2,8 +2,8 @@ package com.suroid.weatherapp.repo
 
 import com.suroid.weatherapp.api.WeatherApi
 import com.suroid.weatherapp.db.CityWeatherDao
-import com.suroid.weatherapp.models.CityEntity
-import com.suroid.weatherapp.models.CityWeatherEntity
+import com.suroid.weatherapp.models.local.CityEntity
+import com.suroid.weatherapp.models.local.CityWeatherEntity
 import com.suroid.weatherapp.utils.extensions.mapToCityEntity
 import com.suroid.weatherapp.utils.extensions.mapToWeatherEntity
 import io.reactivex.Single

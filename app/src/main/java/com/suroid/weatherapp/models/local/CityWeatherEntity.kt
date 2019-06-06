@@ -1,4 +1,4 @@
-package com.suroid.weatherapp.models
+package com.suroid.weatherapp.models.local
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

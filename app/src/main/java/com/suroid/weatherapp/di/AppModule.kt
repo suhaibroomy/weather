@@ -10,11 +10,11 @@ import com.suroid.weatherapp.db.CityDao
 import com.suroid.weatherapp.db.CityWeatherDao
 import com.suroid.weatherapp.db.SelectedCityDao
 import com.suroid.weatherapp.db.WeatherDb
-import com.suroid.weatherapp.models.CityEntity
+import com.suroid.weatherapp.models.local.CityEntity
 import com.suroid.weatherapp.utils.CITIES_JSON_FILE_NAME
 import com.suroid.weatherapp.utils.CITY_ARRAY_LIST_TYPE
+import com.suroid.weatherapp.utils.extensions.loadJSONFromAsset
 import com.suroid.weatherapp.utils.extensions.objectify
-import com.suroid.weatherapp.utils.loadJSONFromAsset
 import dagger.Module
 import dagger.Provides
 import io.reactivex.Completable
@@ -40,7 +40,7 @@ class AppModule(private val app: Application) {
                         //Prepopulate DataBase with list of cities
 
                         Completable.fromCallable {
-                            val cityEntities: List<CityEntity>? = loadJSONFromAsset(app, CITIES_JSON_FILE_NAME)?.objectify(CITY_ARRAY_LIST_TYPE)
+                            val cityEntities: List<CityEntity>? = app.loadJSONFromAsset(CITIES_JSON_FILE_NAME)?.objectify(CITY_ARRAY_LIST_TYPE)
                             cityEntities?.let {
                                 weatherDb.cityDao().insert(it)
                             }
@@ -106,6 +106,11 @@ class AppModule(private val app: Application) {
         return db.selectedCityDao()
     }
 
+    /**
+     * Provides [RxLocation]
+     * @param context [Context] is required as parameter
+     * @return [RxLocation]
+     */
     @Provides
     @Singleton
     fun provideRxLocation(context: Context): RxLocation {

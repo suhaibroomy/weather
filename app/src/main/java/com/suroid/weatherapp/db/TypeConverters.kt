@@ -2,8 +2,8 @@ package com.suroid.weatherapp.db
 
 import androidx.room.TypeConverter
 import com.google.gson.reflect.TypeToken
-import com.suroid.weatherapp.models.TemperatureModel
-import com.suroid.weatherapp.models.WeatherModel
+import com.suroid.weatherapp.models.local.TemperatureModel
+import com.suroid.weatherapp.models.local.WeatherModel
 import com.suroid.weatherapp.utils.extensions.jsonify
 import com.suroid.weatherapp.utils.extensions.objectify
 import java.util.*

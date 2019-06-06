@@ -2,7 +2,7 @@ package com.suroid.weatherapp.repo
 
 import com.suroid.weatherapp.db.CityDao
 import com.suroid.weatherapp.db.SelectedCityDao
-import com.suroid.weatherapp.models.SelectedCityEntity
+import com.suroid.weatherapp.models.local.SelectedCityEntity
 import com.suroid.weatherapp.util.RxImmediateSchedulerRule
 import com.suroid.weatherapp.util.createCityEntity
 import org.junit.Rule

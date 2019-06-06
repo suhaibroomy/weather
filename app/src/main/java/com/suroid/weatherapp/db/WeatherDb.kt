@@ -3,9 +3,9 @@ package com.suroid.weatherapp.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.suroid.weatherapp.models.CityEntity
-import com.suroid.weatherapp.models.CityWeatherEntity
-import com.suroid.weatherapp.models.SelectedCityEntity
+import com.suroid.weatherapp.models.local.CityEntity
+import com.suroid.weatherapp.models.local.CityWeatherEntity
+import com.suroid.weatherapp.models.local.SelectedCityEntity
 
 /**
  * The Room database that contains the Data table

@@ -1,7 +1,7 @@
 package com.suroid.weatherapp.ui.cityselection
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.suroid.weatherapp.models.CityEntity
+import com.suroid.weatherapp.models.local.CityEntity
 import com.suroid.weatherapp.repo.CityRepository
 import com.suroid.weatherapp.util.RxImmediateSchedulerRule
 import com.suroid.weatherapp.util.createCityEntity
