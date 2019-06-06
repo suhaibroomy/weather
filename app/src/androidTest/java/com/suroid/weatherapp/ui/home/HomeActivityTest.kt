@@ -48,7 +48,7 @@ class HomeActivityTest {
     @JvmField
     val animationsRule: DisableAnimationsRule = DisableAnimationsRule(ApplicationProvider.getApplicationContext())
 
-    lateinit var activityScenario: ActivityScenario<HomeActivity>
+    private lateinit var activityScenario: ActivityScenario<HomeActivity>
 
     @Before
     fun init() {

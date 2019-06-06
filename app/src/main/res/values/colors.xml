@@ -11,11 +11,9 @@
     <color name="secondary_text">#757575</color>
     <color name="text_light">#FFFFFF</color>
     <color name="icons">#FFFFFF</color>
-    <color name="divider">#BDBDBD</color>
     <color name="white">#FFFFFF</color>
     <color name="white_60">#99FFFFFF</color>
     <color name="black_alpha_40">#66000000</color>
-    <color name="black_alpha_20">#33000000</color>
     <color name="transparent">#00000000</color>
     <color name="black">#000000</color>
 </resources>

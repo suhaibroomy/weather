@@ -26,7 +26,7 @@ class CitySelectionActivityTest {
     private val cityListLiveData = MutableLiveData<List<CityEntity>>()
     private val citySelectedLivaData = LiveEvent<Boolean>()
 
-    lateinit var activityScenario: ActivityScenario<CitySelectionActivity>
+    private lateinit var activityScenario: ActivityScenario<CitySelectionActivity>
 
     @Rule
     @JvmField

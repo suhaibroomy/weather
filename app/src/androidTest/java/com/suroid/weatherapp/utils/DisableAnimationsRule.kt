@@ -10,7 +10,7 @@ import org.junit.runners.model.Statement
 import java.lang.reflect.Method
 import java.util.*
 
-class DisableAnimationsRule(val context: Context) : TestRule {
+class DisableAnimationsRule(private val context: Context) : TestRule {
     private var mSetAnimationScalesMethod: Method? = null
     private var mGetAnimationScalesMethod: Method? = null
     private var mWindowManagerObject: Any? = null
@@ -18,7 +18,7 @@ class DisableAnimationsRule(val context: Context) : TestRule {
     init {
         try {
             val windowManagerStubClazz = Class.forName("android.view.IWindowManager\$Stub")
-            val asInterface = windowManagerStubClazz.getDeclaredMethod("asInterface", IBinder::class.java!!)
+            val asInterface = windowManagerStubClazz.getDeclaredMethod("asInterface", IBinder::class.java)
             val serviceManagerClazz = Class.forName("android.os.ServiceManager")
             val getService = serviceManagerClazz.getDeclaredMethod("getService", String::class.java)
             val windowManagerClazz = Class.forName("android.view.IWindowManager")

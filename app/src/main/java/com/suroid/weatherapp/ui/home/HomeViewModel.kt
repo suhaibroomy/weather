@@ -47,8 +47,7 @@ class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityW
     }
 
     /**
-     * fetches the location and cityWeather for the current location
-     * @param location location object of the place
+     * fetches the location and cityWeather for the current location and saves it into db
      */
     @SuppressLint("MissingPermission")
     fun fetchForCurrentLocation() {

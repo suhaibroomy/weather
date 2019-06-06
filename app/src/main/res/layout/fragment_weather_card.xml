@@ -113,7 +113,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             tools:src="@drawable/ic_clouds"
-                            app:imageResource="@{viewModel.icon}"
+                            app:imageResource="@{safeUnbox(viewModel.icon)}"
                             app:layout_constraintBottom_toTopOf="@id/tv_city"
                             app:layout_constraintEnd_toStartOf="@+id/tv_temp_description"
                             app:layout_constraintHorizontal_chainStyle="packed"
