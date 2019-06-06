@@ -23,7 +23,7 @@ class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityW
                                         private val cityRepository: CityRepository,
                                         private val rxLocation: RxLocation) : BaseViewModel() {
 
-    val cityListLiveData: MutableLiveData<ArrayList<CityEntity>> = MutableLiveData()
+    val cityListLiveData: MutableLiveData<List<CityEntity>> = MutableLiveData()
     val loading: MutableLiveData<Boolean> = MutableLiveData()
     val showErrorMessage: LiveEvent<Int> = LiveEvent()
 
@@ -33,16 +33,13 @@ class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityW
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        onCitiesFetched(it)
+                        cityListLiveData.value = it
                     }, {
                         onError(it)
                     })
         }
     }
 
-    private fun onCitiesFetched(cityList: List<CityEntity>) {
-        cityListLiveData.value = ArrayList(cityList)
-    }
 
     private fun onError(t: Throwable?) {
         //TODO handle error case
@@ -72,14 +69,15 @@ class HomeViewModel @Inject constructor(private val cityWeatherRepository: CityW
                     .doFinally {
                         loading.value = false
                     }
-                    .doOnError {
+                    .subscribe( {
+
+                    }, {
                         if (it is StatusException || it is GoogleApiConnectionException || it is GoogleApiConnectionSuspendedException) {
                             showErrorMessage.value = R.string.please_check_gps
                         } else {
                             showErrorMessage.value = R.string.cannot_find_location
                         }
-                    }
-                    .subscribe()
+                    })
         }
 
     }

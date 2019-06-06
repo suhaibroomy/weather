@@ -1,88 +1,149 @@
 package com.suroid.weatherapp.ui.weathercards
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
-import com.suroid.weatherapp.models.CityWeatherEntity
 import com.suroid.weatherapp.repo.CityWeatherRepository
 import com.suroid.weatherapp.util.RxImmediateSchedulerRule
+import com.suroid.weatherapp.util.createCityEntity
 import com.suroid.weatherapp.util.createCityWeather
 import com.suroid.weatherapp.util.mock
+import com.suroid.weatherapp.utils.WEATHER_EXPIRY_THRESHOLD_TIME
+import com.suroid.weatherapp.utils.currentTimeInSeconds
 import com.suroid.weatherapp.utils.weatherIconForId
 import com.suroid.weatherapp.utils.weatherImageForId
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.Single
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.mockito.Mockito
+import org.mockito.Mockito.times
 
 @RunWith(JUnit4::class)
 class WeatherCardViewModelTest {
-//    @Rule
-//    @JvmField
-//    val schedulers = RxImmediateSchedulerRule()
-//
-//    @Rule
-//    @JvmField
-//    val architectureComponentsRule = InstantTaskExecutorRule()
-//
-//    private val cityWeatherRepository = mock<CityWeatherRepository>()
-//
-//    private lateinit var viewModel: WeatherCardViewModel
-//
-//    private lateinit var cityWeather: CityWeatherEntity
-//
-//    @Before
-//    fun setUp() {
-//        cityWeather = createCityWeather()
-//        Mockito.`when`(cityWeatherRepository.responseSubject).thenReturn(PublishSubject.create())
-//        viewModel = WeatherCardViewModel(cityWeatherRepository)
-//    }
-//
-//    @Test
-//    fun fetchCityWeatherTest() {
-//        Mockito.doAnswer {
-//            cityWeatherRepository.responseSubject.onNext(ResponseStatus.loading(true, cityWeather))
-//            cityWeatherRepository.responseSubject.onNext(ResponseStatus.loading(false, cityWeather))
-//            cityWeatherRepository.responseSubject.onNext(ResponseStatus.success(cityWeather, cityWeather))
-//        }.`when`(cityWeatherRepository).fetchWeatherOfCity(cityWeather)
-//
-//
-//        val observer = mock<Observer<Boolean>>()
-//        viewModel.loadingStatus.observeForever(observer)
-//        viewModel.setupWithCity(cityWeather)
-//        Mockito.verify(observer).onChanged(true)
-//        Mockito.verify(observer).onChanged(false)
-//
-//        val cityObserver = mock<Observer<String>>()
-//        viewModel.city.observeForever(cityObserver)
-//        Mockito.verify(cityObserver).onChanged("${cityWeather.city.name}, ${cityWeather.city.country}")
-//
-//        val weatherTitleObserver = mock<Observer<String>>()
-//        viewModel.weatherTitle.observeForever(weatherTitleObserver)
-//        Mockito.verify(weatherTitleObserver).onChanged("${cityWeather.currentWeather?.title}")
-//
-//        val humidityObserver = mock<Observer<String>>()
-//        viewModel.humidity.observeForever(humidityObserver)
-//        Mockito.verify(humidityObserver).onChanged("${cityWeather.currentWeather?.humidity}")
-//
-//        val windObserver = mock<Observer<String>>()
-//        viewModel.wind.observeForever(windObserver)
-//        Mockito.verify(windObserver).onChanged("${cityWeather.currentWeather?.windSpeed}")
-//
-//        val minMaxTempObserver = mock<Observer<String>>()
-//        viewModel.minMaxTemp.observeForever(minMaxTempObserver)
-//        Mockito.verify(minMaxTempObserver).onChanged("${cityWeather.currentWeather?.temperature?.minTemp?.toInt()}/${cityWeather.currentWeather?.temperature?.maxTemp?.toInt()}")
-//
-//        val iconObserver = mock<Observer<Int>>()
-//        viewModel.icon.observeForever(iconObserver)
-//        Mockito.verify(iconObserver).onChanged(weatherIconForId(cityWeather.currentWeather?.weather_id ?: 0))
-//
-//        val imageObserver = mock<Observer<Int>>()
-//        viewModel.image.observeForever(imageObserver)
-//        Mockito.verify(imageObserver).onChanged(weatherImageForId(cityWeather.currentWeather?.weather_id ?: 0))
-//    }
+    @Rule
+    @JvmField
+    val schedulers = RxImmediateSchedulerRule()
+
+    @Rule
+    @JvmField
+    val architectureComponentsRule = InstantTaskExecutorRule()
+
+    private val cityWeatherRepository = mock<CityWeatherRepository>()
+
+    private val viewModel = WeatherCardViewModel(cityWeatherRepository)
+
+    private val loadingStatusObserver = mock<(Boolean) -> Unit>()
+    private val tempObserver = mock<(String) -> Unit>()
+    private val cityObserver = mock<(String) -> Unit>()
+    private val weatherTitleObserver = mock<(String?) -> Unit>()
+    private val humidityObserver = mock<(String) -> Unit>()
+    private val minMaxTempObserver = mock<(String) -> Unit>()
+    private val windObserver = mock<(String) -> Unit>()
+    private val iconObserver = mock<(Int) -> Unit>()
+    private val imageObserver = mock<(Int) -> Unit>()
+
+    private val city = createCityEntity()
+    private val cityWeather = createCityWeather(currentTimeInSeconds())
+
+    @Before
+    fun setUp() {
+
+        viewModel.loadingStatus.observeForever {
+            it.let(loadingStatusObserver)
+        }
+
+        viewModel.temp.observeForever {
+            it.let(tempObserver)
+        }
+
+        viewModel.city.observeForever {
+            it.let(cityObserver)
+        }
+
+        viewModel.weatherTitle.observeForever {
+            it.let(weatherTitleObserver)
+        }
+
+        viewModel.humidity.observeForever {
+            it.let(humidityObserver)
+        }
+
+        viewModel.minMaxTemp.observeForever {
+            it.let(minMaxTempObserver)
+        }
+
+        viewModel.wind.observeForever {
+            it.let(windObserver)
+        }
+
+        viewModel.icon.observeForever {
+            it.let(iconObserver)
+        }
+
+        viewModel.image.observeForever {
+            it.let(imageObserver)
+        }
+    }
+
+    @Test
+    fun setupWithCityFromDbTest() {
+        Mockito.`when`(cityWeatherRepository.getCityWeatherByCityId(city)).thenReturn(Single.just(cityWeather))
+
+
+        viewModel.setupWithCity(city)
+
+        Mockito.verify(cityWeatherRepository).getCityWeatherByCityId(city)
+        Mockito.verify(loadingStatusObserver).invoke(true)
+        Mockito.verify(loadingStatusObserver).invoke(false)
+
+        verifyObservables(1)
+    }
+
+    @Test
+    fun setupWithCityFromDbFailTest() {
+        Mockito.`when`(cityWeatherRepository.getCityWeatherByCityId(city)).thenReturn(Single.error(Error("not found")))
+        Mockito.`when`(cityWeatherRepository.fetchWeatherOfCity(city)).thenReturn(Single.just(cityWeather))
+
+        viewModel.setupWithCity(city)
+
+        Mockito.verify(cityWeatherRepository).fetchWeatherOfCity(city)
+        Mockito.verify(loadingStatusObserver, times(2)).invoke(true)
+        Mockito.verify(loadingStatusObserver).invoke(false)
+
+        verifyObservables(1)
+    }
+
+    @Test
+    fun setupWithStaleCityFromDbTest() {
+        val cityWeather = createCityWeather(currentTimeInSeconds() - WEATHER_EXPIRY_THRESHOLD_TIME)
+        Mockito.`when`(cityWeatherRepository.getCityWeatherByCityId(city)).thenReturn(Single.just(cityWeather))
+        Mockito.`when`(cityWeatherRepository.fetchWeatherOfCity(city)).thenReturn(Single.just(cityWeather))
+
+        viewModel.setupWithCity(city)
+
+        Mockito.verify(cityWeatherRepository).fetchWeatherOfCity(city)
+        Mockito.verify(loadingStatusObserver, times(2)).invoke(true)
+        Mockito.verify(loadingStatusObserver, times(2)).invoke(false)
+
+        verifyObservables(2)
+    }
+
+    private fun verifyObservables(times: Int) {
+        cityWeather.currentWeather?.let {
+            it.temperature?.let { temp ->
+                Mockito.verify(tempObserver, times(times)).invoke(temp.temp?.toInt().toString())
+                Mockito.verify(minMaxTempObserver, times(times)).invoke("${temp.minTemp?.toInt()}/${temp.maxTemp?.toInt()}")
+            }
+            Mockito.verify(humidityObserver, times(times)).invoke(it.humidity.toString())
+            Mockito.verify(windObserver, times(times)).invoke(it.windSpeed.toString())
+            Mockito.verify(weatherTitleObserver, times(times)).invoke(it.title)
+            Mockito.verify(iconObserver, times(times)).invoke(weatherIconForId(it.weather_id ?: 0))
+            Mockito.verify(imageObserver, times(times)).invoke(weatherImageForId(it.weather_id ?: 0))
+        }
+        Mockito.verify(cityObserver, times(times)).invoke("${city.name}, ${city.country}")
+
+    }
 
 
 }

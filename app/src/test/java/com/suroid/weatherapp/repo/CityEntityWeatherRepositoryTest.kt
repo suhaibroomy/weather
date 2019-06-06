@@ -2,93 +2,103 @@ package com.suroid.weatherapp.repo
 
 import com.suroid.weatherapp.api.WeatherApi
 import com.suroid.weatherapp.db.CityWeatherDao
-import com.suroid.weatherapp.models.CityWeatherEntity
-import com.suroid.weatherapp.util.RxImmediateSchedulerRule
-import com.suroid.weatherapp.util.createWeatherResponseModel
-import com.suroid.weatherapp.util.mapToWeatherEntityTest
-import com.suroid.weatherapp.util.mock
-import com.suroid.weatherapp.utils.WEATHER_EXPIRY_THRESHOLD_TIME
+import com.suroid.weatherapp.util.*
 import com.suroid.weatherapp.utils.currentTimeInSeconds
-import io.reactivex.Observer
+import com.suroid.weatherapp.utils.extensions.mapToCityEntity
 import io.reactivex.Single
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.mockito.Mockito
-import org.mockito.Mockito.atLeastOnce
 import org.mockito.Mockito.never
 
 @RunWith(JUnit4::class)
 class CityEntityWeatherRepositoryTest {
-//    private val cityWeatherDao = Mockito.mock(CityWeatherDao::class.java)
-//    private val api: WeatherApi = mock()
-//
-//    private val repo = CityWeatherRepository(cityWeatherDao, api)
-//
-//    @Rule
-//    @JvmField
-//    val schedulers = RxImmediateSchedulerRule()
-//
-//    @Test
-//    fun loadCityWeathersTest() {
-//        repo.getAllCityWeathers()
-//        Mockito.verify(cityWeatherDao).getAllCityWeathers()
-//    }
-//
-//    @Test
-//    fun fetchCityWeatherSuccessTest() {
-//        val id = 123
-//        val response = createWeatherResponseModel(id)
-//        Mockito.`when`(api.getWeatherWithId(id)).thenReturn(Single.just(response))
-//
-//        val observer = mock<Observer<ResponseStatus<CityWeatherEntity>>>()
-//        repo.responseSubject.subscribe(observer)
-//
-//        val cityWeather = response.mapToWeatherEntityTest(currentTimeInSeconds() - WEATHER_EXPIRY_THRESHOLD_TIME)
-//
-//        repo.fetchWeatherOfCity(cityWeather)
-//        Mockito.verify(api).getWeatherWithId(id)
-//        Mockito.verify(observer).onNext(ResponseStatus.loading(true, cityWeather))
-//        Mockito.verify(observer, atLeastOnce()).onNext(ResponseStatus.loading(false, cityWeather))
-//        Mockito.verify(cityWeatherDao).update(cityWeather)
-//        Mockito.verify(observer).onNext(ResponseStatus.success(cityWeather, cityWeather))
-//        Mockito.verifyNoMoreInteractions(api)
-//    }
-//
-//    @Test
-//    fun fetchCityWeatherFailTest() {
-//        val id = 123
-//        val response = createWeatherResponseModel(id)
-//        Mockito.`when`(api.getWeatherWithId(id)).thenReturn(Single.just(response))
-//
-//        val observer = mock<Observer<ResponseStatus<CityWeatherEntity>>>()
-//        repo.responseSubject.subscribe(observer)
-//
-//        val cityWeather = response.mapToWeatherEntityTest(currentTimeInSeconds())
-//        repo.fetchWeatherOfCity(cityWeather)
-//        Mockito.verify(api, never()).getWeatherWithId(id)
-//        Mockito.verify(observer).onNext(ResponseStatus.loading(false, cityWeather))
-//    }
-//
-//    @Test
-//    fun fetchCityWeatherLatLongTest() {
-//        val lat = 123.0
-//        val long = 456.0
-//        val response = createWeatherResponseModel()
-//        Mockito.`when`(api.getWeatherWithLatLong(lat = lat, long = long)).thenReturn(Single.just(response))
-//
-//        val observer = mock<Observer<ResponseStatus<CityWeatherEntity>>>()
-//        repo.responseSubject.subscribe(observer)
-//
-//        val cityWeather = response.mapToWeatherEntityTest(currentTimeInSeconds())
-//
-//        repo.fetchWeatherWithLatLong(lat, long)
-//        Mockito.verify(api).getWeatherWithLatLong(lat, long)
-//        Mockito.verify(observer).onNext(ResponseStatus.loading(true, 0))
-//        Mockito.verify(observer, atLeastOnce()).onNext(ResponseStatus.loading(false, 0))
-//        Mockito.verify(cityWeatherDao).upsert(cityWeather)
-//        Mockito.verify(observer).onNext(ResponseStatus.success(cityWeather, 0))
-//        Mockito.verifyNoMoreInteractions(api)
-//    }
+    private val cityWeatherDao: CityWeatherDao = mock()
+    private val api: WeatherApi = mock()
+    private val cityRepository: CityRepository = mock()
+
+    private val repo = CityWeatherRepository(cityRepository, cityWeatherDao, api)
+
+    @Rule
+    @JvmField
+    val schedulers = RxImmediateSchedulerRule()
+
+    @Test
+    fun getCityWeatherByCityIdTest() {
+        val id = 123
+        val cityWeather = createCityWeather()
+        val city = createCityEntity()
+
+        Mockito.`when`(cityWeatherDao.getCityWeatherByCityId(id)).thenReturn(Single.just(cityWeather))
+        repo.getCityWeatherByCityId(city)
+                .test()
+                .assertValue(cityWeather)
+
+        Mockito.verify(cityWeatherDao).getCityWeatherByCityId(id)
+        Mockito.verifyNoMoreInteractions(cityWeatherDao)
+    }
+
+    @Test
+    fun fetchCityWeatherSuccessTest() {
+        val id = 123
+        val response = createWeatherResponseModel(id)
+        Mockito.`when`(api.getWeatherWithId(id)).thenReturn(Single.just(response))
+
+        val cityWeather = response.mapToWeatherEntityTest(currentTimeInSeconds())
+        val city = response.mapToCityEntity()
+
+        repo.fetchWeatherOfCity(city)
+                .test()
+                .assertValue(cityWeather)
+                .dispose()
+        Mockito.verify(api).getWeatherWithId(id)
+        Mockito.verify(cityWeatherDao).update(cityWeather)
+        Mockito.verifyNoMoreInteractions(api)
+        Mockito.verifyNoMoreInteractions(cityWeatherDao)
+    }
+
+    @Test
+    fun fetchCityWeatherFailTest() {
+        val id = 123
+        val response = createWeatherResponseModel(id)
+        val error = Error("Something went wrong")
+
+        Mockito.`when`(api.getWeatherWithId(id)).thenReturn(Single.error(error))
+
+        val cityWeather = response.mapToWeatherEntityTest(currentTimeInSeconds())
+        val city = response.mapToCityEntity()
+
+        repo.fetchWeatherOfCity(city)
+                .test()
+                .assertError(error)
+                .dispose()
+
+        Mockito.verify(api).getWeatherWithId(id)
+        Mockito.verify(cityWeatherDao, never()).update(cityWeather)
+    }
+
+    @Test
+    fun fetchCityWeatherLatLongTest() {
+        val lat = 123.0
+        val long = 456.0
+        val response = createWeatherResponseModel()
+        Mockito.`when`(api.getWeatherWithLatLong(lat = lat, long = long)).thenReturn(Single.just(response))
+
+        val cityWeather = response.mapToWeatherEntityTest(currentTimeInSeconds())
+        val city = response.mapToCityEntity()
+
+        repo.fetchWeatherWithLatLong(lat, long)
+                .test()
+                .assertValue(cityWeather)
+                .dispose()
+
+        Mockito.verify(api).getWeatherWithLatLong(lat, long)
+        Mockito.verify(cityWeatherDao).upsert(cityWeather)
+        Mockito.verify(cityRepository).saveCity(city)
+        Mockito.verifyNoMoreInteractions(api)
+        Mockito.verifyNoMoreInteractions(cityWeatherDao)
+        Mockito.verifyNoMoreInteractions(cityRepository)
+    }
 }

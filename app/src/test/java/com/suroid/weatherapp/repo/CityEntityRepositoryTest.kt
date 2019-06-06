@@ -2,7 +2,9 @@ package com.suroid.weatherapp.repo
 
 import com.suroid.weatherapp.db.CityDao
 import com.suroid.weatherapp.db.SelectedCityDao
+import com.suroid.weatherapp.models.SelectedCityEntity
 import com.suroid.weatherapp.util.RxImmediateSchedulerRule
+import com.suroid.weatherapp.util.createCityEntity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,5 +28,34 @@ class CityEntityRepositoryTest {
         Mockito.verify(cityDao).getAllCities()
     }
 
-    //TODO write some tests
+    @Test
+    fun searchForCityTest() {
+        val query = "testQuery"
+        repo.searchForCity(query)
+        Mockito.verify(cityDao).search(query)
+    }
+
+    @Test
+    fun getSelectedCitiesTest() {
+        repo.getSelectedCities()
+        Mockito.verify(selectedCityDao).getSelectedCities()
+    }
+
+    @Test
+    fun saveCityTest() {
+        val cityEntity = createCityEntity()
+        repo.saveCity(cityEntity)
+        Mockito.verify(cityDao).upsert(cityEntity)
+    }
+
+    @Test
+    fun saveSelectedCityTest() {
+        val cityId = 123
+        repo.saveSelectedCity(cityId)
+                .test()
+                .assertComplete()
+                .dispose()
+
+        Mockito.verify(selectedCityDao).upsert(SelectedCityEntity(cityId))
+    }
 }

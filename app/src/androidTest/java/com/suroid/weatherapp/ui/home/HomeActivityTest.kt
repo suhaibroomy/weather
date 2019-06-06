@@ -5,7 +5,7 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
@@ -28,7 +28,6 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.times
 
-
 class HomeActivityTest {
 
     @Rule
@@ -39,7 +38,7 @@ class HomeActivityTest {
 
     private val loading = MutableLiveData<Boolean>()
     private val showErrorMessage = LiveEvent<Int>()
-    private val cityListLiveData = MutableLiveData<ArrayList<CityEntity>>()
+    private val cityListLiveData = MutableLiveData<List<CityEntity>>()
 
     @Rule
     @JvmField
@@ -95,20 +94,20 @@ class HomeActivityTest {
     @Test
     fun startLoadingTest() {
         viewModel.loading.postValue(true)
-        onView(withId(R.id.progress_bar)).check(ViewAssertions.matches(isDisplayed()))
+        onView(withId(R.id.progress_bar)).check(matches(isDisplayed()))
     }
 
     @Test
     fun stopLoadingTest() {
         viewModel.loading.postValue(false)
-        onView(withId(R.id.progress_bar)).check(ViewAssertions.matches(not(isDisplayed())))
+        onView(withId(R.id.progress_bar)).check(matches(not(isDisplayed())))
     }
 
     @Test
     fun addCardTest() {
         val arr = arrayListOf(createCity())
         viewModel.cityListLiveData.postValue(arr)
-        onView(allOf(withId(R.id.weather_card_root))).check(ViewAssertions.matches(isCompletelyDisplayed()))
+        onView(allOf(withId(R.id.weather_card_root))).check(matches(isCompletelyDisplayed()))
     }
 
     @After

@@ -113,6 +113,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
     androidTestImplementation 'androidx.arch.core:core-testing:2.0.0'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-contrib:3.0.2'
 }
 
 // Uncomment these lines to disable animation on an emulator or a rooted device

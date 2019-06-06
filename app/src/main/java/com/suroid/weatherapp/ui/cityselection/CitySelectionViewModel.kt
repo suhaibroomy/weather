@@ -21,8 +21,6 @@ class CitySelectionViewModel @Inject constructor(private val cityRepository: Cit
     val queryText: MutableLiveData<String> = MutableLiveData()
     val cityEntityListLiveData: MutableLiveData<List<CityEntity>> = MutableLiveData()
     val citySelectedLivaData = LiveEvent<Boolean>()
-    private val cityEntityList: ArrayList<CityEntity> = ArrayList()
-
 
     init {
         launch {
@@ -30,7 +28,7 @@ class CitySelectionViewModel @Inject constructor(private val cityRepository: Cit
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        onCitiesFetched(it)
+                        cityEntityListLiveData.value = it
                     }, {
                         onError(it)
                     })
@@ -39,12 +37,6 @@ class CitySelectionViewModel @Inject constructor(private val cityRepository: Cit
 
     private fun onError(throwable: Throwable) {
         //TODO handle error case
-        Log.d(CitySelectionViewModel::class.java.name, throwable.message)
-    }
-
-    private fun onCitiesFetched(cityEntityList: List<CityEntity>) {
-        this.cityEntityList.addAll(cityEntityList)
-        cityEntityListLiveData.value = cityEntityList
     }
 
     /**
@@ -52,7 +44,6 @@ class CitySelectionViewModel @Inject constructor(private val cityRepository: Cit
      */
     fun refreshData() {
         queryText.value = ""
-        cityEntityListLiveData.value = cityEntityList
     }
 
     /**

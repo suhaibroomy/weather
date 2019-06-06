@@ -67,7 +67,7 @@ class WeatherCardViewModel @Inject constructor(private val cityWeatherRepository
                     .subscribe({
                         updateValues(it, cityEntity)
                     }, {
-                        print(it.localizedMessage)
+                        //TODO handle error
                     })
         }
 

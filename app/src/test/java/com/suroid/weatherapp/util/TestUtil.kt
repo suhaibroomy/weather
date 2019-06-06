@@ -5,8 +5,6 @@ import com.suroid.weatherapp.models.CityWeatherEntity
 import com.suroid.weatherapp.models.TemperatureModel
 import com.suroid.weatherapp.models.WeatherModel
 import com.suroid.weatherapp.models.remote.*
-import org.mockito.ArgumentMatcher
-import java.util.function.Predicate
 
 fun createWeatherResponseModel(id: Int): WeatherResponseModel {
     val main = Main(temp = 1.0f,
@@ -31,12 +29,8 @@ fun createWeatherResponseModel(id: Int): WeatherResponseModel {
 
 fun createWeatherResponseModel() = createWeatherResponseModel(123)
 
-fun createCity() = CityEntity(name = "name", country = "country", id = 0)
+fun createCityEntity() = CityEntity(name = "name", country = "country", id = 123)
 
-fun createCityWeather() = CityWeatherEntity(123,
-        WeatherModel("title", "description", TemperatureModel(1.1f, 2.2f, 3.3f), 4f, 5, 6))
-
-
-fun <T> matches(predicate: Predicate<T>): ArgumentMatcher<T> {
-    return ArgumentMatcher<T> { argument -> predicate.test(argument as T) }
-}
+fun createCityWeather(date: Long = 0) = CityWeatherEntity(123,
+        WeatherModel("title", "description", TemperatureModel(1.1f, 2.2f, 3.3f), 4f, 5, 6),
+        date = date)

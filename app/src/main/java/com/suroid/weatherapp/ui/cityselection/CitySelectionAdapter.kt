@@ -21,7 +21,7 @@ class CitySelectionAdapter(private val context: Context, private val cityAdapter
     private lateinit var cityEntityList: List<CityEntity>
     private var layoutInflater: LayoutInflater = LayoutInflater.from(context)
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): CitySelectionAdapter.CityViewHolder {
+    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): CityViewHolder {
         return CityViewHolder(layoutInflater.inflate(R.layout.item_city_list, viewGroup, false))
     }
 
@@ -29,7 +29,7 @@ class CitySelectionAdapter(private val context: Context, private val cityAdapter
         return if (::cityEntityList.isInitialized) cityEntityList.size else 0
     }
 
-    override fun onBindViewHolder(viewHolder: CitySelectionAdapter.CityViewHolder, position: Int) {
+    override fun onBindViewHolder(viewHolder: CityViewHolder, position: Int) {
         viewHolder.onBind(cityEntityList[position])
         viewHolder.itemView.setOnClickListener {
             cityAdapterDelegate.onItemClick(cityEntityList[position])
