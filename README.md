@@ -4,11 +4,11 @@ This is a sample weather app to demonstrate a clean architecture for building ap
 
 Users can choose their favorite cities which they want to monitor from a preselected list cities or they can choose to detect location of the phone automatically. Weather will be stored in the database and will be refreshed every time user opens the app with a threshold interval which can be adjusted in the project settings
 
-## Demo Video
+### Demo Video
 
 ![Demo GIF of app](sample.gif)
 
-## Project Structure
+### Project Structure
 
 * Kotlin is the main programming language in the project.
 * This project is based on clean architecture.
@@ -35,10 +35,10 @@ api.key="<YOUR API KEY>"
 
 ## Automated Tests
 
-This project contains UI tests as well as Unit Tests. Units tests are run using JUnit and UI Tests are using AndroidJUnitRunner. Both of these can be run  easily either from android studio or command line.
+This project contains UI tests as well as Unit Tests. Units tests are run using JUnit and UI Tests are run using AndroidJUnitRunner. Both of these can be run easily either from android studio or command line.
 
-## UI Tests
-You need to disable animations to run UI tests. This can be done programmatically if you are using emulator or a phone with root access, just uncomment/add the following lines in your app level gradle file and run tests using Android Studio.
+### UI Tests
+You need to disable animations on your phone to run UI tests. This can be done programmatically if you are using emulator or a phone with root access, just uncomment/add the following lines in the app level gradle file and run tests using Android Studio.
 
 ```
 def adb = android.getAdbExe().toString()
@@ -56,7 +56,7 @@ afterEvaluate {
 }
 ```
 
-## Built With
+## Frameworks/Libraries used
 
 * [RxJava](https://github.com/ReactiveX/RxJava) - Reactive framework used in the app
 * [Dagger2](https://github.com/google/dagger) - Dependency Injection Management
