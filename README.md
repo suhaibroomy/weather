@@ -4,7 +4,11 @@ This is a sample weather app to demonstrate a clean architecture for building ap
 
 Users can choose their favorite cities which they want to monitor from a preselected list cities or they can choose to detect location of the phone automatically. Weather will be stored in the database and will be refreshed every time user opens the app with a threshold interval which can be adjusted in the project settings
 
-# Project Architecture
+## Demo Video
+
+![Demo GIF of app](sample.gif)
+
+## Project Structure
 
 * Kotlin is the main programming language in the project.
 * This project is based on clean architecture.
